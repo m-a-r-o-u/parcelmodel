@@ -1,13 +1,13 @@
 class State(object):
-    def __init__(self, T, p, qv, qc, iteration_count=0):
+    def __init__(self, t, T, p, qv, qc):
+        self.t = t
         self.T = T
         self.p = p
         self.qv = qv
         self.qc = qc
-        self.iteration_count = iteration_count
     
     def __repr__(self):
-        return 'State({}, {}, {}, {})'.format(self.T, self.p, self.qv, self.qc)
+        return 'State({}, {}, {}, {}, {})'.format(self.t, self.T, self.p, self.qv, self.qc)
 
-    def copy(self):
-        return State(self.T, self.p, self.qv, self.qc, self.iteration_count)
+    def copy(self):#???
+        return State(self.t, self.T, self.p, self.qv, self.qc)

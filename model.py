@@ -20,14 +20,14 @@ class Model(object):
             logger.log_state(state)
 
     def initial_state(self):
-        return State(280, 100000, 0.010, (0,))
+        return State(0, 280, 100000, 0.010, (0,))
 
     def is_converged(self, state):
-        return state.iteration_count == 1000
+        return state.t >= 10 * 60
 
     def step(self, old_state):
         new_state = old_state.copy() 
-        new_state.iteration_count += 1
+        new_state.t += self.dt
         qc_sum = sum(old_state.qc)
         cooling_rate = bf.thermal_radiative_cooling_rate(old_state.T, qc_sum, self.T_env)
         new_state.T += cooling_rate * self.dt 
