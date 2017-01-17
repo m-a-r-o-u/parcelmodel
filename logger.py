@@ -7,7 +7,8 @@ def logger_factory(config):
         return constructor(**kwargs)
 
 class BaseLogger(object):
-    pass
+    def set_units(self, units):
+        pass
 
 
 class Logger(BaseLogger):
@@ -60,6 +61,10 @@ class MultiLogger(BaseLogger):
     def __init__(self, loggers):
         self.loggers = loggers
 
+    def set_units(self, units):
+        for logger in self.loggers:
+            logger.set_units(units)
+
     def log_state(self, state):
         for logger in self.loggers:
             logger.log_state(state)
@@ -70,9 +75,13 @@ class MultiLogger(BaseLogger):
 
 class PlotTimeSeriesLogger(BaseLogger):
     def __init__(self, quantities):
+        self.units = []
         self.t = []
         self.quantities = quantities
         self.data = [[] for _ in quantities]
+
+    def set_units(self, units):
+        self.units = [units[quantity] for quantity in self.quantities]
 
     def log_state(self, state):
         self.t.append(state.t)
@@ -82,9 +91,9 @@ class PlotTimeSeriesLogger(BaseLogger):
     def finalize(self):
         import matplotlib.pyplot as plt
         fig, axes = plt.subplots(len(self.quantities))
-        for name, storage, ax in zip(self.quantities, self.data, axes):
+        for name, storage, ax, unit in zip(self.quantities, self.data, axes, self.units):
             ax.plot(self.t, storage)
-            ax.set_ylabel(name)
+            ax.set_ylabel('{} [{}]'.format(name, unit))
         axes[-1].set_xlabel('time')
         fig.savefig('daten.png')
 
