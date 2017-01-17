@@ -9,11 +9,11 @@ class FinalStateLogger(object):
     def __init__(self):
         self.last_state = None
 
-    def finalize(self):
-        print self.last_state
-
     def log_state(self, state):
         self.last_state = state
+
+    def finalize(self):
+        print self.last_state
 
 class PlotTLogger(object):
     def finalize(self):
