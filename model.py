@@ -12,12 +12,15 @@ class Model(object):
         'qc':'kg kg-1',
     }
 
-    def __init__(self):
-        self.r_min = (1e-6,)
-        self.particle_count = (50e6,)
-        self.radiation = False
-        self.T_env = 250.
-        self.dt = 1.
+    def __init__(self, model_parameters, initial_state):
+        self.r_min = model_parameters['r_min']
+        self.particle_count = model_parameters['particle_count']
+        self.radiation = model_parameters.get('radiation', False)
+        self.T_env = model_parameters['T']
+        self.dt = model_parameters['dt']
+        self._initial_state = initial_state
+        assert len(self.r_min) == len(self.particle_count)
+        assert len(self.r_min) == len(self._initial_state.qc)
 
     def run(self, logger):
         state = self.initial_state()
@@ -28,7 +31,7 @@ class Model(object):
             logger.log_state(state)
 
     def initial_state(self):
-        return State(0, 280, 100000, 0.010, (0,))
+        return self._initial_state.copy()
 
     def is_converged(self, state):
         return state.t >= 10 * 60

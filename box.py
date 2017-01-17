@@ -1,14 +1,11 @@
 import sys
 import yaml
-from model import Model
+from setup import model_init
 from logger import logger_factory
-
-def model_init():
-    return Model()
 
 def main():
     config = yaml.load(sys.stdin)
-    model = model_init()
+    model = model_init(config['initial_conditions'])
     with logger_factory(config['output']) as logger:
         model.run(logger)
 
