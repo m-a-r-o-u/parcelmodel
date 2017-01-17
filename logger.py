@@ -1,3 +1,11 @@
+def logger_factory(config):
+    if isinstance(config, list):
+        return MultiLogger([logger_factory(c) for c in config])
+    else:
+        constructor = LOGGERS[config['type']]
+        kwargs = {k:v for k,v in config.iteritems() if k != 'type'}
+        return constructor(**kwargs)
+
 class Logger(object):
     def finalize(self):
         pass
@@ -55,3 +63,7 @@ class MultiLogger(object):
     def finalize(self):
         for logger in self.loggers:
             logger.finalize()
+
+LOGGERS = {
+    'Logger': Logger,
+     }
