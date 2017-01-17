@@ -6,14 +6,18 @@ def logger_factory(config):
         kwargs = {k:v for k,v in config.iteritems() if k != 'type'}
         return constructor(**kwargs)
 
-class Logger(object):
+class BaseLogger(object):
+    pass
+
+
+class Logger(BaseLogger):
     def finalize(self):
         pass
 
     def log_state(self, state):
         print state
 
-class FinalStateLogger(object):
+class FinalStateLogger(BaseLogger):
     def __init__(self):
         self.last_state = None
 
@@ -23,7 +27,7 @@ class FinalStateLogger(object):
     def finalize(self):
         print self.last_state
 
-class PlotTLogger(object):
+class PlotTLogger(BaseLogger):
     def __init__(self):
         self.t = []
         self.T = []
@@ -37,7 +41,7 @@ class PlotTLogger(object):
         plt.plot(self.t, self.T)
         plt.savefig('T.png')
 
-class PlotQVLogger(object):
+class PlotQVLogger(BaseLogger):
     def __init__(self):
         self.t = []
         self.qv = []
@@ -52,7 +56,7 @@ class PlotQVLogger(object):
         plt.plot(self.t, self.qv)
         plt.savefig('qv.png')
 
-class MultiLogger(object):
+class MultiLogger(BaseLogger):
     def __init__(self, loggers):
         self.loggers = loggers
 
@@ -64,7 +68,7 @@ class MultiLogger(object):
         for logger in self.loggers:
             logger.finalize()
 
-class PlotTimeSeriesLogger(object):
+class PlotTimeSeriesLogger(BaseLogger):
     def __init__(self, quantities):
         self.t = []
         self.quantities = quantities
