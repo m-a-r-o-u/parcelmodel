@@ -20,12 +20,10 @@ def model_init():
     return Model()
 
 def main():
-    logger = logger_init(2)
+    logger = logger_init(4)
     model = model_init()
     model.run(logger)
     logger.finalize()
 
 if __name__ == "__main__":
     main()
-
-
