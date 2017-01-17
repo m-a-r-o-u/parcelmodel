@@ -15,7 +15,7 @@ class Model(object):
     def __init__(self):
         self.r_min = (1e-6,)
         self.particle_count = (50e6,)
-        self.rad_adjust = False
+        self.radiation = False
         self.T_env = 250.
         self.dt = 1.
 
@@ -59,7 +59,7 @@ class Model(object):
         es = bf.saturation_pressure(T)
         S = bf.relative_humidity(T, p, qv) - 1
       
-        if self.rad_adjust:
+        if self.radiation:
             E = bf.thermal_radiation(T, qc_sum)
         else:
             E = 0
