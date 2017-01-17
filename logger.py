@@ -13,6 +13,12 @@ class BaseLogger(object):
     def finalize(self):
         pass
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.finalize()
+
 class Logger(BaseLogger):
     def log_state(self, state):
         print state

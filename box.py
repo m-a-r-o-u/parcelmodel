@@ -8,10 +8,9 @@ def model_init():
 
 def main():
     config = yaml.load(sys.stdin)
-    logger = logger_factory(config['output'])
     model = model_init()
-    model.run(logger)
-    logger.finalize()
+    with logger_factory(config['output']) as logger:
+        model.run(logger)
 
 if __name__ == "__main__":
     main()
