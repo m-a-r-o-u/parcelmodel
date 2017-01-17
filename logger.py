@@ -16,12 +16,34 @@ class FinalStateLogger(object):
         print self.last_state
 
 class PlotTLogger(object):
+    def __init__(self):
+        self.t = []
+        self.T = []
+    
+    def log_state(self, state):
+        self.t.append(state.t)
+        self.T.append(state.T)
+
     def finalize(self):
-        pass
+        import matplotlib.pyplot as plt
+        plt.plot(self.t, self.T)
+        plt.savefig('T.png')
+
+class PlotQVLogger(object):
+    def __init__(self):
+        self.t = []
+        self.qv = []
     
     def log_state(self, state):
         print state.T
- 
+        self.t.append(state.t)
+        self.qv.append(state.qv)
+
+    def finalize(self):
+        import matplotlib.pyplot as plt
+        plt.plot(self.t, self.qv)
+        plt.savefig('qv.png')
+
 class MultiLogger(object):
     def __init__(self, loggers):
         self.loggers = loggers
