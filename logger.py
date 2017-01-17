@@ -21,3 +21,15 @@ class PlotTLogger(object):
     
     def log_state(self, state):
         print state.T
+ 
+class MultiLogger(object):
+    def __init__(self, loggers):
+        self.loggers = loggers
+
+    def log_state(self, state):
+        for logger in self.loggers:
+            logger.log_state(state)
+
+    def finalize(self):
+        for logger in self.loggers:
+            logger.finalize()
