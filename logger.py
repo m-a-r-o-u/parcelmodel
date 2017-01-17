@@ -10,11 +10,10 @@ class BaseLogger(object):
     def set_units(self, units):
         pass
 
-
-class Logger(BaseLogger):
     def finalize(self):
         pass
 
+class Logger(BaseLogger):
     def log_state(self, state):
         print state
 
