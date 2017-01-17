@@ -4,6 +4,13 @@ import boxmodel_constants as bc
 from state import State
 
 class Model(object):
+    units = {
+        't':'s',
+        'T':'K',
+        'p':'Pa',
+        'qv':'kg kg-1',
+        'qc':'kg kg-1',
+    }
 
     def __init__(self):
         self.r_min = (1e-6,)
@@ -14,6 +21,7 @@ class Model(object):
 
     def run(self, logger):
         state = self.initial_state()
+        logger.set_units(self.units)
         logger.log_state(state)
         while not self.is_converged(state):
             state = self.step(state)
