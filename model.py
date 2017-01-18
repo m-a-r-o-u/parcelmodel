@@ -18,6 +18,7 @@ class Model(object):
         self.radiation = model_parameters.get('radiation', False)
         self.T_env = model_parameters['T']
         self.dt = model_parameters['dt']
+        self.t_max = 600
         self._initial_state = initial_state
         assert len(self.r_min) == len(self.particle_count)
         assert len(self.r_min) == len(self._initial_state.qc)
@@ -34,7 +35,7 @@ class Model(object):
         return self._initial_state.copy()
 
     def is_converged(self, state):
-        return state.t >= 10 * 60
+        return state.t >= self.t_max
 
     def step(self, old_state):
         new_state = old_state.copy() 
