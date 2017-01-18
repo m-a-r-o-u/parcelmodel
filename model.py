@@ -18,7 +18,7 @@ class Model(object):
         self.radiation = model_parameters.get('radiation', False)
         self.T_env = model_parameters['T']
         self.dt = model_parameters['dt']
-        self.t_max = 600
+        self.t_max = model_parameters['t_max']
         self._initial_state = initial_state
         assert len(self.r_min) == len(self.particle_count)
         assert len(self.r_min) == len(self._initial_state.qc)

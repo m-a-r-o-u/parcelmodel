@@ -23,6 +23,7 @@ def model_init(initial_conditions):
         'particle_count': particle_count,
         'T': initial_conditions['environment']['T'],
         'dt': initial_conditions['dt'],
+        't_max': initial_conditions['t_max'],
         }
     intial_state = State(0, 280., 100000., 0.01, (0,)*len(r_min))
     return Model(model_parameters, intial_state)
