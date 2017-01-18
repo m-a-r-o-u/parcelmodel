@@ -1,4 +1,3 @@
-from scipy.integrate import odeint
 import boxmodel_functions as bf
 import boxmodel_constants as bc
 from state import State
@@ -49,7 +48,7 @@ class Model(object):
     def calculate_tendencies(self, state):
         qc_sum = sum(state.qc)
         def condensation(qc, particle_count, r_min):
-            return self.condensation(state.T, state.p, state.qv, qc_sum, qc, particle_count, r_min)
+            return bf.condensation(state.T, state.p, state.qv, qc_sum, qc, particle_count, r_min, self.dt, self.radiation)
         delta_Ts, delta_qvs, delta_qc = zip(*map(condensation, state.qc, self.particle_count, self.r_min))
         return delta_Ts, delta_qvs, delta_qc
 
@@ -60,24 +59,3 @@ class Model(object):
         cooling_rate = bf.thermal_radiative_cooling_rate(old_state.T, qc_sum, self.T_env)
         new_state.T += cooling_rate * self.dt
         return new_state
-
-    def condensation(self, T, p, qv, qc_sum, qc, particle_count, r_min):
-        r_old = max(r_min, bf.radius(qc, particle_count))
-      
-        es = bf.saturation_pressure(T)
-        S = bf.relative_humidity(T, p, qv) - 1
-      
-        if self.radiation:
-            E = bf.thermal_radiation(T, qc_sum)
-        else:
-            E = 0
-       
-        r_new = odeint(bf.differential_growth_by_condensation, r_old, [0, self.dt], args=(E, es, T, S), mxstep=2000)[1,0]
-      
-        qc_new = bf.cloud_water(particle_count, r_new)
-        
-        delta_qc = (qc_new - qc)
-      
-        delta_T = delta_qc * bc.H_LAT / bc.C_P
-        delta_qv = -delta_qc
-        return delta_T, delta_qv, delta_qc
