@@ -40,7 +40,7 @@ class Model(object):
     def step(self, old_state):
         new_state = self.prepare_new_state(old_state)
 
-        delta_Ts, delta_qvs, new_state.qc = self.calculate_tendencies(old_state)
+        delta_Ts, delta_qvs, new_state.qc = self.calculate_tendencies(new_state)
 
         new_state.T += sum(delta_Ts)
         new_state.qv += sum(delta_qvs)
