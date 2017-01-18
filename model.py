@@ -39,7 +39,6 @@ class Model(object):
 
     def step(self, old_state):
         new_state = self.prepare_new_state(old_state)
-
         delta_Ts, delta_qvs, new_state.qc = self.calculate_tendencies(new_state)
 
         new_state.T += sum(delta_Ts)
@@ -47,15 +46,10 @@ class Model(object):
         return new_state
 
     def calculate_tendencies(self, state):
-        delta_Ts, delta_qvs, state.qc = zip(*[self.condensation(state.T,
-                                                                state.p,
-                                                                state.qv,
-                                                                sum(state.qc),
-                                                                qc,
-                                                                particle_count,
-                                                                r_min)
-                                                  for qc, particle_count, r_min
-                                                  in zip(state.qc, self.particle_count, self.r_min)])
+        qc_sum = sum(state.qc)
+        def condensation(qc, particle_count, r_min):
+            return self.condensation(state.T, state.p, state.qv, qc_sum, qc, particle_count, r_min)
+        delta_Ts, delta_qvs, state.qc = zip(*map(condensation, state.qc, self.particle_count, self.r_min))
         return delta_Ts, delta_qvs, state.qc
 
     def prepare_new_state(self, old_state):
