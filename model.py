@@ -38,16 +38,12 @@ class Model(object):
         return state.t >= self.t_max
 
     def step(self, old_state):
-        new_state = old_state.copy() 
-        new_state.t += self.dt
-        qc_sum = sum(old_state.qc)
-        cooling_rate = bf.thermal_radiative_cooling_rate(old_state.T, qc_sum, self.T_env)
-        new_state.T += cooling_rate * self.dt 
+        new_state = self.prepare_new_state(old_state)
 
         delta_Ts, delta_qvs, new_state.qc = zip(*[self.condensation(old_state.T, 
                                                                     old_state.p, 
                                                                     old_state.qv, 
-                                                                    qc_sum, 
+                                                                    sum(old_state.qc),
                                                                     qc, 
                                                                     particle_count, 
                                                                     r_min)
@@ -55,6 +51,14 @@ class Model(object):
                                                   in zip(old_state.qc, self.particle_count, self.r_min)])
         new_state.T += sum(delta_Ts)
         new_state.qv += sum(delta_qvs)
+        return new_state
+
+    def prepare_new_state(self, old_state):
+        new_state = old_state.copy()
+        new_state.t += self.dt
+        qc_sum = sum(old_state.qc)
+        cooling_rate = bf.thermal_radiative_cooling_rate(old_state.T, qc_sum, self.T_env)
+        new_state.T += cooling_rate * self.dt
         return new_state
 
     def condensation(self, T, p, qv, qc_sum, qc, particle_count, r_min):
