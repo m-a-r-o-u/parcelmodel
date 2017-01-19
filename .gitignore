@@ -4,3 +4,4 @@
 *.eps
 *.yaml
 *.nc
+plot*.py
