@@ -90,8 +90,7 @@ def condensation(T, p, qv, qc_sum, qc, particle_count, r_min, dt, radiation):
     else:
         E = 0
     r_new = odeint(differential_growth_by_condensation, r_old, [0, dt], args=(E, es, T, S), mxstep=2000)[1,0]
-    qc_new = cloud_water(particle_count, r_new)
-    delta_qc = (qc_new - qc)
+    delta_qc = cloud_water(particle_count, r_new) - qc
     delta_T = delta_qc * c.H_LAT / c.C_P
     delta_qv = -delta_qc
     return delta_T, delta_qv, delta_qc
