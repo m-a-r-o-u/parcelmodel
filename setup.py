@@ -35,6 +35,10 @@ def model_init(initial_conditions):
         't_max': initial_conditions['t_max'],
         'radiation': initial_conditions['radiation']
         }
-    intial_state = State(0, 280., 100000., 0.01, (0,)*len(r_min))
+    intial_state = State(0,
+                         initial_conditions['T'],
+                         initial_conditions['p'],
+                         initial_conditions['qv'],
+                         (0,)*len(r_min))
     return Model(model_parameters, intial_state)
 
