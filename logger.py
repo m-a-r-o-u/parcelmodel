@@ -104,7 +104,11 @@ class PlotTimeSeriesLogger(BaseLogger):
 
 class NetCDFLogger(BaseLogger):
     def __init__(self):
+        self.units = {}
         self.states = []
+
+    def set_units(self, units):
+        self.units = units
 
     def log_state(self, state):
         self.states.append(state)
@@ -127,6 +131,12 @@ class NetCDFLogger(BaseLogger):
             p_nc[:] = [state.p for state in self.states]
             qv_nc[:] = [state.qv for state in self.states]
             qc_nc[:] = [state.qc for state in self.states]
+
+            time_nc.units = self.units['t']
+            T_nc.units = self.units['T']
+            p_nc.units = self.units['p']
+            qv_nc.units = self.units['qv']
+            qc_nc.units = self.units['qc']
 
 LOGGERS = {
     'MultiPlotLogger': PlotTimeSeriesLogger,
