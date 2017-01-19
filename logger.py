@@ -129,7 +129,7 @@ class NetCDFLogger(BaseLogger):
             qc_nc[:] = [state.qc for state in self.states]
 
 LOGGERS = {
-    'MultiPlot': PlotTimeSeriesLogger,
+    'MultiPlotLogger': PlotTimeSeriesLogger,
     'Logger': Logger,
     'NetCDFLogger': NetCDFLogger,
      }
