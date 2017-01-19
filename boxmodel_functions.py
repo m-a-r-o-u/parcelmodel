@@ -83,14 +83,38 @@ def differential_growth_by_condensation(r, t, E_net, es, T, S):
 
 def condensation(T, p, qv, qc_sum, qc, particle_count, r_min, dt, radiation):
     r_old = max(r_min, radius(qc, particle_count))
-    es = saturation_pressure(T)
-    S = relative_humidity(T, p, qv) - 1
-    if radiation:
-        E = thermal_radiation(T, qc_sum)
+    if r_old == r_min:
+        es = saturation_pressure(T)
+        S = relative_humidity(T, p, qv) - 1
+
+        if radiation:
+            E = thermal_radiation(T, qc_sum)
+        else:
+            E = 0
+
+        if differential_growth_by_condensation(r_min, 0, E, es, T, S) > 0.:
+            r_new = odeint(differential_growth_by_condensation, r_old, [0, dt], args=(E, es, T, S), mxstep=2000)[1,0]
+            delta_qc = cloud_water(particle_count, r_new)
+            delta_T = delta_qc * c.H_LAT / c.C_P
+            delta_qv = -delta_qc
+            return delta_T, delta_qv, delta_qc
+        else:
+            r_new = r_old
+            delta_qc = - qc
+            delta_T = delta_qc * c.H_LAT / c.C_P
+            delta_qv = -delta_qc
+            return delta_T, delta_qv, delta_qc
     else:
-        E = 0
-    r_new = odeint(differential_growth_by_condensation, r_old, [0, dt], args=(E, es, T, S), mxstep=2000)[1,0]
-    delta_qc = cloud_water(particle_count, r_new) - qc
-    delta_T = delta_qc * c.H_LAT / c.C_P
-    delta_qv = -delta_qc
-    return delta_T, delta_qv, delta_qc
+        es = saturation_pressure(T)
+        S = relative_humidity(T, p, qv) - 1
+
+        if radiation:
+            E = thermal_radiation(T, qc_sum)
+        else:
+            E = 0
+
+        r_new = odeint(differential_growth_by_condensation, r_old, [0, dt], args=(E, es, T, S), mxstep=2000)[1,0]
+        delta_qc = cloud_water(particle_count, r_new) - qc
+        delta_T = delta_qc * c.H_LAT / c.C_P
+        delta_qv = -delta_qc
+        return delta_T, delta_qv, delta_qc
