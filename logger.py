@@ -102,7 +102,34 @@ class PlotTimeSeriesLogger(BaseLogger):
         axes[-1].set_xlabel('time')
         fig.savefig('daten.png')
 
+class NetCDFLogger(BaseLogger):
+    def __init__(self):
+        self.states = []
+
+    def log_state(self, state):
+        self.states.append(state)
+
+    def finalize(self):
+        from netCDF4 import Dataset
+        with Dataset('./states.nc', mode='w', format='NETCDF3_64BIT') as file_handle:
+            t_dim_nc = 'time'
+            particle_dim_nc = 'super_particles'
+            file_handle.createDimension(t_dim_nc, len(self.states))
+            file_handle.createDimension(particle_dim_nc, len(self.states[0].qc))
+            time_nc = file_handle.createVariable('time', 'i4', (t_dim_nc))
+            T_nc = file_handle.createVariable('T', 'f4', (t_dim_nc))
+            p_nc = file_handle.createVariable('p', 'f4', (t_dim_nc))
+            qv_nc = file_handle.createVariable('qv', 'f4', (t_dim_nc))
+            qc_nc = file_handle.createVariable('qc', 'f4', (t_dim_nc, particle_dim_nc))
+
+            time_nc[:] = [state.t for state in self.states]
+            T_nc[:] = [state.T for state in self.states]
+            p_nc[:] = [state.p for state in self.states]
+            qv_nc[:] = [state.qv for state in self.states]
+            qc_nc[:] = [state.qc for state in self.states]
+
 LOGGERS = {
     'MultiPlot': PlotTimeSeriesLogger,
     'Logger': Logger,
+    'NetCDFLogger': NetCDFLogger,
      }
