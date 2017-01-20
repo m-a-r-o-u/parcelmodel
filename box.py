@@ -3,6 +3,14 @@ import yaml
 from setup import model_init
 from logger import logger_factory
 
+def return_timestamp():
+  '''returns the current time stamp'''
+  import time, datetime
+
+  tt=time.time()
+  dt=datetime.datetime.fromtimestamp(tt).strftime('%Y-%m-%dT%H:%M:%S')
+  return dt
+
 def logger_config(config):
   return config['output']['logger']
 
