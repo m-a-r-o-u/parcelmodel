@@ -4,7 +4,7 @@ from setup import model_init
 from logger import logger_factory
 
 def logger_config(config):
-  return config['output']
+  return config['output']['logger']
 
 def main():
     config = yaml.load(sys.stdin)
