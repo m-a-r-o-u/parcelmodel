@@ -11,6 +11,13 @@ def return_timestamp():
   dt=datetime.datetime.fromtimestamp(tt).strftime('%Y-%m-%dT%H:%M:%S')
   return dt
 
+def set_timestamp(config):
+    path_key = 'file_path'
+    current_time_stamp = return_timestamp()
+    if path_key in config['output']:
+        config['output'][path_key] = config['output'][path_key].replace('time_stamp', current_time_stamp)
+    return config
+
 def set_global_path(config):
     path_key = 'file_path'
     output_path = None
@@ -23,6 +30,7 @@ def set_global_path(config):
     return config
 
 def logger_config(config):
+    config = set_timestamp(config)
     config = set_global_path(config)
     return config['output']['logger']
 
