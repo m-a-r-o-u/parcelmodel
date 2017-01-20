@@ -103,10 +103,17 @@ class PlotTimeSeriesLogger(BaseLogger):
         fig.savefig('daten.png')
 
 class NetCDFLogger(BaseLogger):
-    def __init__(self, file_name):
+    def __init__(self, file_name='states.nc', file_path='./'):
+        self.file_path = file_path
         self.file_name = file_name
         self.units = {}
         self.states = []
+        self.check_directory(self.file_path)
+
+    def check_directory(self, file_path):
+        import os
+        if not os.path.exists(file_path):
+            os.makedirs(file_path)
 
     def set_units(self, units):
         self.units = units
@@ -116,7 +123,7 @@ class NetCDFLogger(BaseLogger):
 
     def finalize(self):
         from netCDF4 import Dataset
-        with Dataset('./' + self.file_name, mode='w', format='NETCDF3_64BIT') as file_handle:
+        with Dataset(self.file_path + self.file_name, mode='w', format='NETCDF3_64BIT') as file_handle:
             t_dim_nc = 'time'
             particle_dim_nc = 'super_particles'
             file_handle.createDimension(t_dim_nc, len(self.states))
