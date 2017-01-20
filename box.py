@@ -11,8 +11,20 @@ def return_timestamp():
   dt=datetime.datetime.fromtimestamp(tt).strftime('%Y-%m-%dT%H:%M:%S')
   return dt
 
+def set_global_path(config):
+    path_key = 'file_path'
+    output_path = None
+    if path_key in config['output']:
+        output_path =  config['output'][path_key]
+    if not output_path == None:
+        for c in config['output']['logger']:
+          if path_key in c:
+            c[path_key] = output_path
+    return config
+
 def logger_config(config):
-  return config['output']['logger']
+    config = set_global_path(config)
+    return config['output']['logger']
 
 def main():
     config = yaml.load(sys.stdin)
