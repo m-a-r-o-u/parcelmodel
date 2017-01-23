@@ -79,7 +79,9 @@ class MultiLogger(BaseLogger):
             logger.finalize()
 
 class PlotTimeSeriesLogger(BaseLogger):
-    def __init__(self, quantities):
+    def __init__(self, quantities, file_name='time_series', file_path='./'):
+        self.file_name = file_name
+        self.file_path = file_path
         self.units = []
         self.t = []
         self.quantities = quantities
@@ -100,10 +102,10 @@ class PlotTimeSeriesLogger(BaseLogger):
             ax.plot(self.t, storage)
             ax.set_ylabel('{} [{}]'.format(name, unit))
         axes[-1].set_xlabel('time')
-        fig.savefig('daten.png')
+        fig.savefig(self.file_path + self.file_name + '.png')
 
 class NetCDFLogger(BaseLogger):
-    def __init__(self, file_name='states.nc', file_path='./'):
+    def __init__(self, file_name='time_series', file_path='./'):
         self.file_path = file_path
         self.file_name = file_name
         self.units = {}
@@ -123,7 +125,7 @@ class NetCDFLogger(BaseLogger):
 
     def finalize(self):
         from netCDF4 import Dataset
-        with Dataset(self.file_path + self.file_name, mode='w', format='NETCDF3_64BIT') as file_handle:
+        with Dataset(self.file_path + self.file_name + '.nc', mode='w', format='NETCDF3_64BIT') as file_handle:
             t_dim_nc = 'time'
             particle_dim_nc = 'super_particles'
             file_handle.createDimension(t_dim_nc, len(self.states))
