@@ -7,6 +7,13 @@ def modify_config_tree(inp, year):
         return inp.replace('time_stamp', year)
     return inp
 
+def modify_item_in_config_tree(inp, key, value):
+    if isinstance(inp, list):
+        return [modify_item_in_config_tree(i, key, value) for i in inp]
+    mod_inp = inp
+    mod_inp[key] = value
+    return mod_inp
+
 def return_timestamp():
   '''returns the current time stamp'''
   import time, datetime
@@ -19,6 +26,10 @@ def set_timestamp(config):
     return modify_config_tree(config, current_timestamp)
 
 def set_global_path(config):
+    key = 'file_path'
+    if key in config['globals']:
+        value = config['globals']['file_path']
+        modify_item_in_config_tree(config['output']['logger'], key, value)
     return config
 
 def logger_config(config):
