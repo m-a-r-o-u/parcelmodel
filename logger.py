@@ -4,15 +4,11 @@ def logger_factory(config):
         return MultiLogger([logger_factory(c) for c in config])
     else:
         constructor = LOGGERS[config['type']]
-        kwargs = generate_kwargs(constructor, config)
-        return constructor(**kwargs)
+        return constructor(**kwargs(constructor, config))
 
-def generate_kwargs(constructor, config):
+def kwargs(constructor, config):
     import inspect
-    inspected_args = [_i for _i in inspect.getargspec(constructor.__init__).args if not _i == 'self']
-    yaml_args = {k:v for k,v in config.iteritems() if k != 'type'}
-    kwargs = {i:yaml_args[i] for i in inspected_args if i in yaml_args}
-    return kwargs
+    return {k:v for k,v in config.iteritems() if k in inspect.getargspec(constructor.__init__).args}
 
 class BaseLogger(object):
     def set_units(self, units):
