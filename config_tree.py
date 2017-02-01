@@ -10,9 +10,13 @@ def modify_config_tree(inp, year):
 def modify_item_in_config_tree(inp, key, value):
     if isinstance(inp, list):
         return [modify_item_in_config_tree(i, key, value) for i in inp]
-    mod_inp = inp
-    mod_inp[key] = value
-    return mod_inp
+    return {k:modify_one_item(k, v, key, value) for k,v in inp.iteritems()}
+
+def modify_one_item(k, v, k_ref, v_ref):
+    if k == k_ref:
+        return v_ref
+    else:
+        return v
 
 def return_timestamp():
   '''returns the current time stamp'''
