@@ -1,5 +1,4 @@
 def logger_factory(config):
-    import inspect
     if isinstance(config, list):
         return MultiLogger([logger_factory(c) for c in config])
     else:
