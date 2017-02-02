@@ -165,6 +165,11 @@ class NetCDFLogger(BaseLogger):
             qv_nc.units = self.units['qv']
             qc_nc.units = self.units['qc']
 
+            file_handle.distribution = self.informations['type']
+            file_handle.ccn = self.informations['total']
+            file_handle.sp = self.informations['groups']
+            file_handle.radiation = int(self.informations['radiation'])
+
 LOGGERS = {
     'MultiPlotLogger': PlotTimeSeriesLogger,
     'Logger': Logger,
