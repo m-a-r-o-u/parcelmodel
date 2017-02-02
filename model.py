@@ -20,6 +20,7 @@ class Model(object):
         self.t_max = model_parameters['t_max']
         self._initial_state = initial_state
         self.distribution = model_parameters['distribution']
+        self.distribution['radiation'] = self.radiation
         assert len(self.r_min) == len(self.particle_count)
         assert len(self.r_min) == len(self._initial_state.qc)
 
