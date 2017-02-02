@@ -13,6 +13,9 @@ class BaseLogger(object):
     def set_units(self, units):
         pass
 
+    def set_informations(self, infos):
+        pass
+
     def finalize(self):
         pass
 
@@ -73,6 +76,10 @@ class MultiLogger(BaseLogger):
         for logger in self.loggers:
             logger.set_units(units)
 
+    def set_informations(self, infos):
+        for logger in self.loggers:
+            logger.set_informations(infos)
+
     def log_state(self, state):
         for logger in self.loggers:
             logger.log_state(state)
@@ -114,6 +121,7 @@ class NetCDFLogger(BaseLogger):
         self.file_path = file_path
         self.file_name = file_name + '.nc'
         self.units = {}
+        self.informations = {}
         self.states = []
         self.check_directory(self.file_path)
 
@@ -124,6 +132,9 @@ class NetCDFLogger(BaseLogger):
 
     def set_units(self, units):
         self.units = units
+
+    def set_informations(self, infos):
+        self.informations = infos
 
     def log_state(self, state):
         self.states.append(state)
