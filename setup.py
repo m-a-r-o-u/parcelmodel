@@ -29,7 +29,8 @@ def model_init(initial_conditions):
         'T': initial_conditions['environment']['T'],
         'dt': initial_conditions['dt'],
         't_max': initial_conditions['t_max'],
-        'radiation': initial_conditions['radiation']
+        'radiation': initial_conditions['radiation'],
+        'distribution': initial_conditions['particle_distribution']
         }
     intial_state = State(0,
                          initial_conditions['T'],

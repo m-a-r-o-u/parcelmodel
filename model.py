@@ -19,12 +19,14 @@ class Model(object):
         self.dt = model_parameters['dt']
         self.t_max = model_parameters['t_max']
         self._initial_state = initial_state
+        self.distribution = model_parameters['distribution']
         assert len(self.r_min) == len(self.particle_count)
         assert len(self.r_min) == len(self._initial_state.qc)
 
     def run(self, logger):
         state = self.initial_state()
         logger.set_units(self.units)
+        logger.set_informations(self.distribution)
         logger.log_state(state)
         while not self.is_converged(state):
             state = self.step(state)
