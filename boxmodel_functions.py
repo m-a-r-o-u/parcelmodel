@@ -81,6 +81,13 @@ def differential_growth_by_condensation(r, t, E_net, es, T, S):
   r_new = (S / r + c2 * E_net) / (c1 * c.RHO_H2O)
   return r_new
 
+def differential_growth_by_condensation_jacobian(r, t, E_net, es, T, S):
+  '''jacobian of differential diffusional growth equation returning dr/dt [m s-1] from ...units...'''
+  c1 = c.H_LAT ** 2 / (c.R_V * c.K * T ** 2) + c.R_V * T / (c.D * es)
+  c2 = c.H_LAT / (c.R_V * c.K * T ** 2)
+  r_new = - S / r ** 2 / (c1 * c.RHO_H2O)
+  return r_new
+
 def condensation(T, p, qv, qc_sum, qc, particle_count, r_min, dt, radiation):
     r_old = max(r_min, radius(qc, particle_count))
     es = saturation_pressure(T)
@@ -96,4 +103,9 @@ def condensation(T, p, qv, qc_sum, qc, particle_count, r_min, dt, radiation):
     return delta_T, delta_qv, delta_qc
 
 def condensation_solver(r_old, dt, E, es, T, S):
-    return odeint(differential_growth_by_condensation, r_old, [0, dt], args=(E, es, T, S), mxstep=2000)[1,0]
+    return odeint(differential_growth_by_condensation,
+                  r_old,
+                  [0, dt],
+                  Dfun=differential_growth_by_condensation_jacobian,
+                  args=(E, es, T, S),
+                  mxstep=2000)[1,0]
