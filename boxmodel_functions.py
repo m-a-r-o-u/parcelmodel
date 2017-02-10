@@ -89,14 +89,15 @@ def differential_growth_by_condensation_jacobian(r, t, E_net, es, T, S):
   return r_new
 
 def condensation(T, p, qv, qc_sum, qc, particle_count, r_min, dt, radiation):
-    r_old = max(r_min, radius(qc, particle_count))
+    r_old = np.maximum(r_min, radius(qc, particle_count))
     es = saturation_pressure(T)
     S = relative_humidity(T, p, qv) - 1
     if radiation:
         E = thermal_radiation(T, qc_sum)
     else:
         E = 0
-    r_new = condensation_solver_wrapper(r_old, r_min, dt, E, es, T, S)
+    r_new = condensation_solver_linear(r_old, dt, E, es, T, S)
+    r_new = np.maximum(r_new, r_min)
     delta_qc = cloud_water(particle_count, r_new) - qc
     delta_T = delta_qc * c.H_LAT / c.C_P
     delta_qv = -delta_qc

@@ -1,3 +1,4 @@
+import numpy as np
 import boxmodel_functions as bf
 import boxmodel_constants as bc
 from state import State
@@ -12,12 +13,14 @@ class Model(object):
     }
 
     def __init__(self, model_parameters, initial_state):
-        self.r_min = model_parameters['r_min']
-        self.particle_count = model_parameters['particle_count']
+        self.r_min = np.array(model_parameters['r_min'])
+        self.particle_count = np.array(model_parameters['particle_count'])
         self.radiation = model_parameters.get('radiation', False)
         self.T_env = model_parameters['T']
         self.dt = model_parameters['dt']
         self.t_max = model_parameters['t_max']
+        initial_state = initial_state.copy()
+        initial_state.qc = np.array(initial_state.qc, dtype='float')
         self._initial_state = initial_state
         self.distribution = model_parameters['distribution']
         self.distribution['radiation'] = self.radiation
@@ -43,16 +46,16 @@ class Model(object):
         new_state = self.prepare_new_state(old_state)
         delta_Ts, delta_qvs, delta_qc = self.calculate_tendencies(new_state)
 
-        new_state.qc = tuple( nqc + dqc for nqc, dqc in zip(new_state.qc, delta_qc))
-        new_state.T += sum(delta_Ts)
-        new_state.qv += sum(delta_qvs)
+        new_state.qc = new_state.qc + delta_qc
+        new_state.T += np.sum(delta_Ts)
+        new_state.qv += np.sum(delta_qvs)
         return new_state
 
     def calculate_tendencies(self, state):
         qc_sum = sum(state.qc)
         def condensation(qc, particle_count, r_min):
             return bf.condensation(state.T, state.p, state.qv, qc_sum, qc, particle_count, r_min, self.dt, self.radiation)
-        delta_Ts, delta_qvs, delta_qc = zip(*map(condensation, state.qc, self.particle_count, self.r_min))
+        delta_Ts, delta_qvs, delta_qc = condensation(state.qc, self.particle_count, self.r_min)
         return delta_Ts, delta_qvs, delta_qc
 
     def prepare_new_state(self, old_state):
