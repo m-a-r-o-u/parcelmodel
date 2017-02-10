@@ -103,19 +103,5 @@ def condensation(T, p, qv, qc_sum, qc, particle_count, r_min, dt, radiation):
     delta_qv = -delta_qc
     return delta_T, delta_qv, delta_qc
 
-def condensation_solver_wrapper(r_old, r_min, dt, E, es, T, S):
-    if(differential_growth_by_condensation(r_old, 0, E, es, T, S)<0 and r_old==r_min):
-        return r_min
-    else:
-        return condensation_solver_linear(r_old, dt, E, es, T, S)
-
-def condensation_solver(r_old, dt, E, es, T, S):
-    return odeint(differential_growth_by_condensation,
-                  r_old,
-                  [0, dt],
-                  Dfun=differential_growth_by_condensation_jacobian,
-                  args=(E, es, T, S),
-                  mxstep=2000)[1,0]
-
 def condensation_solver_linear(r_old, dt, E, es, T, S):
     return r_old + dt * differential_growth_by_condensation(r_old, dt, E, es, T, S)
