@@ -9,7 +9,7 @@ def saturation_pressure(T):
   #T_min = 228.15
   #T_max = 333.15
   #assert (T_min < T < T_max), "{0} is out range ({1}, {2}) [K] for magnus approximation".format(T, T_min, T_max)
-  es = 611 * np.exp(17.62 * (T - 273.15) / (243.12 + (T - 273.15)))
+  es = c.ES0 * np.exp(17.62 * (T - c.T0) / (243.12 + (T - c.T0)))
   return es
 
 def saturation_vapor(T, p):
