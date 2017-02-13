@@ -24,6 +24,7 @@ class Model(object):
         self._initial_state = initial_state
         self.distribution = model_parameters['distribution']
         self.distribution['radiation'] = self.radiation
+        self.output_step = model_parameters['output_step']
         assert len(self.r_min) == len(self.particle_count)
         assert len(self.r_min) == len(self._initial_state.qc)
 
@@ -33,7 +34,8 @@ class Model(object):
         logger.set_informations(self.distribution)
         logger.log_state(state)
         while not self.is_converged(state):
-            state = self.step(state)
+            for i in range(self.output_step):
+                state = self.step(state)
             logger.log_state(state)
 
     def initial_state(self):
