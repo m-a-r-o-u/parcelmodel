@@ -1,3 +1,5 @@
+from system_utils import check_make_directory
+
 def logger_factory(config):
     if isinstance(config, list):
         return MultiLogger([logger_factory(c) for c in config])
@@ -96,6 +98,7 @@ class PlotTimeSeriesLogger(BaseLogger):
         self.t = []
         self.quantities = quantities
         self.data = [[] for _ in quantities]
+        check_make_directory(self.file_path)
 
     def set_units(self, units):
         self.units = [units[quantity] for quantity in self.quantities]
@@ -123,12 +126,7 @@ class NetCDFLogger(BaseLogger):
         self.units = {}
         self.informations = {}
         self.states = []
-        self.check_directory(self.file_path)
-
-    def check_directory(self, file_path):
-        import os
-        if not os.path.exists(file_path):
-            os.makedirs(file_path)
+        check_make_directory(self.file_path)
 
     def set_units(self, units):
         self.units = units
