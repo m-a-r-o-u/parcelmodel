@@ -117,7 +117,7 @@ class PlotTimeSeriesLogger(BaseLogger):
             ax.plot(self.t, storage)
             ax.set_ylabel('{} [{}]'.format(name, unit))
         axes[-1].set_xlabel('time')
-        fig.savefig(join(self.file_path, self.file_name))
+        fig.savefig(join(self.file_path, self.file_name), bbox_inches='tight')
 
 class NetCDFLogger(BaseLogger):
     def __init__(self, file_name='time_series', file_path='./'):
@@ -163,6 +163,7 @@ class NetCDFLogger(BaseLogger):
             qv_nc.units = self.units['qv']
             qc_nc.units = self.units['qc']
 
+            #TODO specify data type for those variables
             file_handle.distribution = self.informations['type']
             file_handle.ccn = self.informations['total']
             file_handle.sp = self.informations['groups']
