@@ -55,9 +55,10 @@ class Model(object):
 
     def calculate_tendencies(self, state):
         qc_sum = sum(state.qc)
-        def condensation(qc, particle_count, r_min):
-            return bf.condensation(state.T, state.p, state.qv, qc_sum, qc, particle_count, r_min, self.dt, self.radiation)
-        delta_Ts, delta_qvs, delta_qc = condensation(state.qc, self.particle_count, self.r_min)
+        S_perturbations = bf.conservative_gauss_perturbations(0.008, len(self.r_min), math=np)
+        def condensation(qc, particle_count, r_min, S_perturbation):
+            return bf.condensation(state.T, state.p, state.qv, qc_sum, qc, particle_count, r_min, self.dt, self.radiation, S_perturbation)
+        delta_Ts, delta_qvs, delta_qc = condensation(state.qc, self.particle_count, self.r_min, S_perturbations)
         return delta_Ts, delta_qvs, delta_qc
 
     def prepare_new_state(self, old_state):

@@ -115,10 +115,10 @@ def differential_growth_by_condensation_jacobian(r, t, E_net, es, T, S):
   r_new = - S / r ** 2 / (c1 * c.RHO_H2O)
   return r_new
 
-def condensation(T, p, qv, qc_sum, qc, particle_count, r_min, dt, radiation, math=np):
+def condensation(T, p, qv, qc_sum, qc, particle_count, r_min, dt, radiation, S_perturbation, math=np):
     r_old = math.maximum(r_min, radius(qc, particle_count))
     es = saturation_pressure(T)
-    S = relative_humidity(T, p, qv) - 1
+    S = relative_humidity(T, p, qv) - 1 + S_perturbation
     if radiation:
         E = thermal_radiation(T, qc_sum)
     else:
