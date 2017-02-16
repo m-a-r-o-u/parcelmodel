@@ -77,29 +77,9 @@ def critical_super_saturation(r_ccn, T=273.15, math=np):
 def koehler(r, r_ccn, T=273.15, math=np):
     return kelvin_curvature_effect(r, T=T, math=math) * raoult_mixture_effect(r, r_ccn)
 
-def conservative_gauss_perturbation(std, number, math=np):
-    rest = number%2
-    first_half = math.abs(math.random.normal(0., std, (number - rest) / 2))
-    second_half = math.abs(math.random.normal(0., std, (number - rest) / 2))
-    negative_half = -second_half * math.sum(first_half) / math.sum(second_half)
-    index = normalized_random_choice(number-rest, math=math)
-    iterators = {1: iter(first_half), -1: iter(negative_half)}
-    def produce_items(i):
-        return iterators[i].next()
-    perturbations = math.array([produce_items(i) for i in index])#CHECK???
-    return random_insert(perturbations, 0., rest)
-
-def normalized_random_choice(number, math=np):
-    array = math.random.choice([-1, 1], size=number)
-    summe = math.sum(array)
-    while(summe >= 1 or summe <= -1):
-        rand_position = math.random.randint(0, number)
-        array[rand_position] = -summe / math.abs(summe)
-        summe = math.sum(array)
-    return array
-
-def random_insert(array, item, n_items, math=np):
-    return math.insert(array, math.random.randint(len(array), size=n_items), item)
+def conservative_gauss_perturbations(std, number, math=np):
+    perturbations = math.random.normal(0., std, number)
+    return perturbations - perturbations.mean()
 
 #???CHECK???
 def optical_thickness(qc):
