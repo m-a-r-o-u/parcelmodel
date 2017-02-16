@@ -22,16 +22,20 @@ class Model(object):
         initial_state = initial_state.copy()
         initial_state.qc = np.array(initial_state.qc, dtype='float')
         self._initial_state = initial_state
-        self.distribution = model_parameters['distribution']
-        self.distribution['radiation'] = self.radiation
         self.output_step = model_parameters['output_step']
+        self.perturbation = model_parameters.get('perturbation', False)
+        self.std = model_parameters.get('std')
+        self.information = model_parameters['distribution']
+        self.information['radiation'] = self.radiation
+        self.information['perturbation'] = self.perturbation
+        self.information['std'] = self.std
         assert len(self.r_min) == len(self.particle_count)
         assert len(self.r_min) == len(self._initial_state.qc)
 
     def run(self, logger):
         state = self.initial_state()
         logger.set_units(self.units)
-        logger.set_informations(self.distribution)
+        logger.set_informations(self.information)
         logger.log_state(state)
         while not self.is_converged(state):
             for i in range(self.output_step):

@@ -168,6 +168,8 @@ class NetCDFLogger(BaseLogger):
             file_handle.ccn = self.informations['total']
             file_handle.sp = self.informations['groups']
             file_handle.radiation = int(self.informations['radiation'])
+            file_handle.perturbation = int(self.informations['perturbation'])
+            file_handle.std = self.informations['std']
 
 LOGGERS = {
     'MultiPlotLogger': PlotTimeSeriesLogger,
