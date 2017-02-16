@@ -54,6 +54,29 @@ def stefan_boltzmann_law(T):
   P = c.SIGMA_SB * T ** 4
   return P
 
+def kelvins_parameter(T=273.15):
+    return 2 * c.GAMMA / c.R_V / c.RHO_H2O / T
+
+def kelvin_curvature_effect(r, T=273.15, math=np):
+    A = kelvins_parameter(T=T)
+    return math.exp(A / r )
+
+def raoults_parameter(r_ccn):
+    return 2 * r_ccn ** 3  * c.RHO_S * c.M_MOL_H2O / c.RHO_H2O / c.M_MOL_S
+
+def raoult_mixture_effect(r, r_ccn):
+    B = raoults_parameter(r_ccn)
+    return (1 - B / r ** 3)
+
+def critical_radius(r_ccn, T=273.15, math=np):
+    return math.sqrt(3. * raoults_parameter(r_ccn) / kelvins_parameter(T=T))
+
+def critical_super_saturation(r_ccn, T=273.15, math=np):
+    return math.sqrt(4. * kelvins_parameter(T=T) ** 3 / 27. / raoults_parameter(r_ccn))
+
+def koehler(r, r_ccn, T=273.15, math=np):
+    return kelvin_curvature_effect(r, T=T, math=math) * raoult_mixture_effect(r, r_ccn)
+
 #???CHECK???
 def optical_thickness(qc):
   '''optical thickness [units???] from cloud water mixing ratio [kg kg-1]'''
