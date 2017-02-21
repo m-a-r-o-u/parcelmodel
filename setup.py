@@ -21,7 +21,7 @@ def create_particle_distribution(definitions):
     kwargs = {k:v for k,v in definitions.iteritems() if k != 'type'}
     return PARTICLE_DISTRIBUTIONS[definitions['type']](**kwargs)
 
-def model_init(initial_conditions):
+def model_init(initial_conditions, executer):
     r_min, particle_count = create_particle_distribution(initial_conditions['particle_distribution'])
     model_parameters = {
         'r_min': r_min,
@@ -40,5 +40,5 @@ def model_init(initial_conditions):
                          initial_conditions['p'],
                          initial_conditions['qv'],
                          (0,)*len(r_min))
-    return Model(model_parameters, intial_state)
+    return Model(model_parameters, intial_state, executer)
 
