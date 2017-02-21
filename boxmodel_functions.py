@@ -39,14 +39,14 @@ def relative_humidity(T,p,qv):
   r = qv / saturation_vapor(T,p)
   return r
 
-def cloud_water(N, r, math=np):
+def cloud_water(N, r):
   '''Return could water [kg kg-1] from number density N [m-3] and radius r [m]'''
-  qc = 4. / 3. * math.pi * r ** 3 * c.RHO_H2O / c.RHO_AIR * N
+  qc = 4. / 3. * np.pi * r ** 3 * c.RHO_H2O / c.RHO_AIR * N
   return qc
 
-def radius(qc, N, math=np):
+def radius(qc, N):
   '''Return mean radius in [m] from qc [kg kg-1] and N [m-3]'''
-  r = (3. / 4. / math.pi * qc * c.RHO_AIR / c.RHO_H2O / N) ** (1./3.)
+  r = (3. / 4. / np.pi * qc * c.RHO_AIR / c.RHO_H2O / N) ** (1./3.)
   return r
 
 def stefan_boltzmann_law(T):
