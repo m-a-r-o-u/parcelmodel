@@ -112,9 +112,12 @@ def thermal_radiative_cooling_rate_using_libRadTran():
 #    kelvin_per_day = 250.
 #    return - kelvin_per_day / (60.*60.*24.)
 
-def thermal_radiation_using_libRadTran():
-    hr = thermal_radiative_cooling_rate_using_libRadTran()
-    return - hr * c.C_P / ( np.pi / 2) / 1.e8 / 1.e-10
+def thermal_radiation_using_libRadTran(radiation):
+    if radiation:
+        hr = thermal_radiative_cooling_rate_using_libRadTran()
+        return - hr * c.C_P / ( np.pi / 2) / 1.e8 / 1.e-10
+    else:
+        return 0
 
 def differential_growth_by_condensation(r, t, E_net, es, T, S):
   '''differential diffusional growth equation returning dr/dt [m s-1] from ...units...'''
@@ -134,11 +137,7 @@ def condensation(T, p, qv, qc_sum, qc, particle_count, r_min, dt, radiation, S_p
     r_old = math.maximum(r_min, radius(qc, particle_count))
     es = saturation_pressure(T)
     S = relative_humidity(T, p, qv) - 1 + S_perturbation
-    if radiation:
-       #E = thermal_radiation(T, qc_sum)
-        E = thermal_radiation_using_libRadTran()
-    else:
-        E = 0
+    E = thermal_radiation_using_libRadTran(radiation)
     r_new = condensation_solver_linear(r_old, dt, E, es, T, S)
     r_new = math.maximum(r_new, r_min)
     delta_qc = cloud_water(particle_count, r_new) - qc
