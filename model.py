@@ -64,7 +64,8 @@ class Model(object):
         new_state = old_state.copy()
         new_state.t += self.dt
         qc_sum = math.sum(old_state.qc)
-        cooling_rate = bf.thermal_radiative_cooling_rate(old_state.T, qc_sum, self.T_env)
+        #cooling_rate = bf.thermal_radiative_cooling_rate(old_state.T, qc_sum, self.T_env)
+        cooling_rate = bf.thermal_radiative_cooling_rate_using_libRadTran()
         new_state.T += cooling_rate * self.dt
         return new_state
 
