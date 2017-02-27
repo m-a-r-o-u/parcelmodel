@@ -9,7 +9,7 @@ import executer
 def main():
     args = argparse_init()
     config = yaml.load( open(args.yaml) )
-    model = model_init(config['initial_conditions'], executer.DISPATCHER['theano'])
+    model = model_init(config['initial_conditions'], executer.DISPATCHER[config['globals']['executer']])
     with logger_factory(logger_config(config)) as logger:
         model.run(logger)
 
