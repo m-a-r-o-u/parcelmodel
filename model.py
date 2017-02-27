@@ -51,10 +51,7 @@ class Model(object):
 
     def calculate_tendencies(self, state, math=np):
         qc_sum = math.sum(state.qc)
-        if self.perturbation:
-            S_perturbations = bf.conservative_gauss_perturbations(self.std, len(self.r_min))
-        else:
-            S_perturbations = math.zeros(len(self.r_min))
+        S_perturbations = bf.conservative_gauss_perturbations(self.std, len(self.r_min), self.perturbation)
         def condensation(qc, particle_count, r_min, S_perturbation):
             return bf.condensation(state.T, state.p, state.qv, qc_sum, qc, particle_count, r_min, self.dt, self.radiation, S_perturbation, math=math)
         delta_Ts, delta_qvs, delta_qc = condensation(state.qc, self.particle_count, self.r_min, S_perturbations)

@@ -77,9 +77,12 @@ def critical_super_saturation(r_ccn, T=273.15, math=np):
 def koehler(r, r_ccn, T=273.15, math=np):
     return kelvin_curvature_effect(r, T=T, math=math) * raoult_mixture_effect(r, r_ccn)
 
-def conservative_gauss_perturbations(std, number):
-    perturbations = np.random.normal(0., std, number)
-    return perturbations - perturbations.mean()
+def conservative_gauss_perturbations(std, number, perturbation):
+    if perturbation:
+        perturbations = np.random.normal(0., std, number)
+        return perturbations - perturbations.mean()
+    else:
+        return np.zeros(number)
 
 #???CHECK???
 def optical_thickness(qc):
