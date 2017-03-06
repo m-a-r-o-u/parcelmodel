@@ -110,11 +110,11 @@ class PlotTimeSeriesLogger(BaseLogger):
 
     def finalize(self):
         import matplotlib.pyplot as plt
+        import numpy as np
         from os.path import join
-
         fig, axes = plt.subplots(len(self.quantities))
         for name, storage, ax, unit in zip(self.quantities, self.data, axes, self.units):
-            ax.plot(self.t, storage)
+            ax.plot(np.array(self.t) / 60., storage)
             ax.set_ylabel('{} [{}]'.format(name, unit))
         axes[-1].set_xlabel('time')
         fig.savefig(join(self.file_path, self.file_name), bbox_inches='tight')
