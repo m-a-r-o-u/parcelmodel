@@ -44,10 +44,17 @@ def cloud_water(N, r):
   qc = 4. / 3. * np.pi * r ** 3 * c.RHO_H2O / c.RHO_AIR * N
   return qc
 
+def cloud_water_without_rmin(N ,r ,r_min):
+    return cloud_water(N, r) - cloud_water(N, r_min)
+
 def radius(qc, N):
   '''Return mean radius in [m] from qc [kg kg-1] and N [m-3]'''
   r = (3. / 4. / np.pi * qc * c.RHO_AIR / c.RHO_H2O / N) ** (1./3.)
   return r
+
+def radius_with_rmin(qc ,N ,r_min):
+    r = (3. / 4. / np.pi * (qc + cloud_water(N, r_min)) * c.RHO_AIR / c.RHO_H2O / N) ** (1./3.)
+    return r
 
 def stefan_boltzmann_law(T):
   '''Return power of a black body [W m-2] from T [K]'''
@@ -133,14 +140,14 @@ def differential_growth_by_condensation_jacobian(r, t, E_net, es, T, S):
   r_new = - S / r ** 2 / (c1 * c.RHO_H2O)
   return r_new
 
-def condensation(T, p, qv, qc_sum, qc, particle_count, r_min, dt, radiation, S_perturbation, math=np):
-    r_old = math.maximum(r_min, radius(qc, particle_count))
+def condensation(T, p, qv, qc_sum, qc, particle_count, r_min, dt, E, S_perturbation, math=np):
+    r_old = math.maximum(r_min, radius_with_rmin(qc, particle_count, r_min))
     es = saturation_pressure(T)
     S = relative_humidity(T, p, qv) - 1 + S_perturbation
     E = thermal_radiation_using_libRadTran(radiation)
     r_new = condensation_solver_linear(r_old, dt, E, es, T, S)
     r_new = math.maximum(r_new, r_min)
-    delta_qc = cloud_water(particle_count, r_new) - qc
+    delta_qc = cloud_water_without_rmin(particle_count, r_new, r_min) - qc
     delta_T = delta_qc * c.H_LAT / c.C_P
     delta_qv = -delta_qc
     return delta_T, delta_qv, delta_qc
