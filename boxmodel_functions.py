@@ -91,23 +91,34 @@ def conservative_gauss_perturbations(std, number, perturbation):
     else:
         return np.zeros(number)
 
-#???CHECK???
-def optical_thickness(qc):
-  '''optical thickness [units???] from cloud water mixing ratio [kg kg-1]'''
-  tau = qc * 10. * 1000. + 0.1
-  return tau
+def effective_radius(qc ,N ,r_min):
+    return np.sum(radius_with_rmin(qc ,N ,r_min) ** 3) / np.sum(radius_with_rmin(qc, N, r_min) ** 2)
 
 #???CHECK???
-def thermal_radiation(T, qc, T_env=250, math=np):
-  '''thermal radiation [units???] from cloud water mixing ratio [kg kg-1]'''
-  tau   = optical_thickness(qc)
-  E_net = (stefan_boltzmann_law(T) - stefan_boltzmann_law(T_env))* (1 - math.exp(-tau))
-  return E_net
+def optical_thickness(qc, N, r_min):
+    '''Stephens 1978b'''
+    tau = 3. / 2. * np.sum(qc) / effective_radius(qc, N, r_min)
+    return tau
+
+def dynamic_cooling():
+    lapse_rate = 10
+    velocity = 0.5
+    return -lapse_rate / 1000. * velocity
 
 #???CHECK???
-def thermal_radiative_cooling_rate(T, qc, T_env=250.):
+def thermal_radiation(T, qc, N, r_min, radiation, T_env=250, math=np):
+    '''thermal radiation [units???] from cloud water mixing ratio [kg kg-1]'''
+    if radiation:
+        tau   = optical_thickness(qc, N, r_min)
+        E_net = (stefan_boltzmann_law(T) - stefan_boltzmann_law(T_env))* (1 - math.exp(-tau))
+        return E_net
+    else:
+        return 0.
+
+#???CHECK???
+def thermal_radiative_cooling_rate(T, qc, N, r_min, T_env=250.):
   '''cooling rate due to radiation [units???] from cloud water mixing ratio [kg kg-1]'''
-  E_net = thermal_radiation(T, qc, T_env=T_env)
+  E_net = thermal_radiation(T, qc, N, r_min, T_env=T_env)
   cooling_rate = - E_net * 80 / 20 / (3600. * 24.)
   return cooling_rate
 
@@ -144,7 +155,7 @@ def condensation(T, p, qv, qc_sum, qc, particle_count, r_min, dt, E, S_perturbat
     r_old = math.maximum(r_min, radius_with_rmin(qc, particle_count, r_min))
     es = saturation_pressure(T)
     S = relative_humidity(T, p, qv) - 1 + S_perturbation
-    E = thermal_radiation_using_libRadTran(radiation)
+#    E = thermal_radiation_using_libRadTran(radiation)
     r_new = condensation_solver_linear(r_old, dt, E, es, T, S)
     r_new = math.maximum(r_new, r_min)
     delta_qc = cloud_water_without_rmin(particle_count, r_new, r_min) - qc

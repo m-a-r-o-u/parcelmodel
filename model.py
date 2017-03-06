@@ -52,8 +52,9 @@ class Model(object):
     def calculate_tendencies(self, state, math=np):
         qc_sum = math.sum(state.qc)
         S_perturbations = bf.conservative_gauss_perturbations(self.std, len(self.r_min), self.perturbation)
+        E = bf.thermal_radiation(state.T, state.qc, self.particle_count, self.r_min, self.radiation)
         def condensation(qc, particle_count, r_min, S_perturbation):
-            return bf.condensation(state.T, state.p, state.qv, qc_sum, qc, particle_count, r_min, self.dt, self.radiation, S_perturbation, math=math)
+            return bf.condensation(state.T, state.p, state.qv, qc_sum, qc, particle_count, r_min, self.dt, E, S_perturbation, math=math)
         delta_Ts, delta_qvs, delta_qc = condensation(state.qc, self.particle_count, self.r_min, S_perturbations)
         return delta_Ts, delta_qvs, delta_qc
 
@@ -62,7 +63,7 @@ class Model(object):
         new_state.t += self.dt
         qc_sum = math.sum(old_state.qc)
         #cooling_rate = bf.thermal_radiative_cooling_rate(old_state.T, qc_sum, self.T_env)
-        cooling_rate = bf.thermal_radiative_cooling_rate_using_libRadTran()
+        cooling_rate = bf.dynamic_cooling()
         new_state.T += cooling_rate * self.dt
         return new_state
 
