@@ -23,6 +23,8 @@ GAMMA     = Constant(72.7e-3,      'N m-1',              'surface tension of wat
 M_MOL_H2O = Constant( 18.e-3,   'kg mol-1',                          'molecular mass of water')
 M_MOL_S   = Constant(58.4e-3,   'kg mol-1',                           'molecular mass of NaCl')
 RHO_S     = Constant( 2.16e3,     'kg m-3',                       'density of NaCL at 298 [K]')
+ETA_AIR   = Constant(17.1e-6,       'Pa s',              'dynamic viscosity of air at 273 [K]')
+G         = Constant(   9.81,  'kg m2 s-2',                                 'gravity constant')
 
 #R       = 287.102           #[J/(kg K)]
 #R_V     = 461.401           #[J/(kg K)]
