@@ -53,9 +53,14 @@ class Model(object):
         qc_sum = math.sum(state.qc)
         S_perturbations = bf.conservative_gauss_perturbations(self.std, len(self.r_min), self.perturbation)
         E = bf.thermal_radiation(state.T, state.qc, self.particle_count, self.r_min, self.radiation)
+        m = nucleation_slice(state, S_perturbations, self.r_min, self.particle_count)
         def condensation(qc, particle_count, r_min, S_perturbation):
             return bf.condensation(state.T, state.p, state.qv, qc_sum, qc, particle_count, r_min, self.dt, E, S_perturbation, math=math)
-        delta_Ts, delta_qvs, delta_qc = condensation(state.qc, self.particle_count, self.r_min, S_perturbations)
+        delta_Ts, delta_qvs, delta_qc = np.zeros((3, len(state.qc)))
+        delta_Ts[m], delta_qvs[m], delta_qc[m] = condensation(state.qc[m],
+                                                              self.particle_count[m],
+                                                              self.r_min[m],
+                                                              S_perturbations[m])
         return delta_Ts, delta_qvs, delta_qc
 
     def prepare_new_state(self, old_state, math=np):
@@ -66,6 +71,11 @@ class Model(object):
         cooling_rate = bf.dynamic_cooling()
         new_state.T += cooling_rate * self.dt
         return new_state
+
+def nucleation_slice(state, S_perturbations, r_min, particle_count):
+    S = bf.relative_humidity(state.T, state.p, state.qv) - 1 + S_perturbations
+    m = (S < bf.critical_super_saturation(r_min, state.T)) & (np.isclose(bf.radius_with_rmin(state.qc, particle_count, r_min), r_min))
+    return [not i for i in m]
 
 def step(model, old_state, math=np):
     new_state = model.prepare_new_state(old_state, math=math)

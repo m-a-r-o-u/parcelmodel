@@ -54,4 +54,3 @@ def model_init(initial_conditions, executer):
                          initial_conditions['qv'],
                          (0,)*len(r_min))
     return Model(model_parameters, intial_state, executer)
-
