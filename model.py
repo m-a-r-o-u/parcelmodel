@@ -10,12 +10,14 @@ class Model(object):
         'p':'Pa',
         'qv':'kg kg-1',
         'qc':'kg kg-1',
+        'z':'m',
     }
 
     def __init__(self, model_parameters, initial_state, executer):
         self.r_min = np.array(model_parameters['r_min'])
         self.particle_count = np.array(model_parameters['particle_count'])
         self.radiation = model_parameters.get('radiation', False)
+        self.w = model_parameters['w']
         self.T_env = model_parameters['T']
         self.dt = model_parameters['dt']
         self.t_max = model_parameters['t_max']
@@ -29,6 +31,7 @@ class Model(object):
         self.information['radiation'] = self.radiation
         self.information['perturbation'] = self.perturbation
         self.information['std'] = self.std
+        self.atmosphere = bf.interp_afglus('./input/afglus.dat')
         assert len(self.r_min) == len(self.particle_count)
         assert len(self.r_min) == len(self._initial_state.qc)
         self.executer = executer(step, self, initial_state, self.output_step)
@@ -68,8 +71,11 @@ class Model(object):
         new_state.t += self.dt
         qc_sum = math.sum(old_state.qc)
         #cooling_rate = bf.thermal_radiative_cooling_rate(old_state.T, qc_sum, self.T_env)
-        cooling_rate = bf.dynamic_cooling()
-        new_state.T += cooling_rate * self.dt
+        cooling_rate = bf.dynamic_cooling(self.w)
+        new_state.z = new_state.z + self.w * self.dt
+        new_state.p = self.atmosphere(new_state.z.mean())['p']
+        new_state.T = self.atmosphere(new_state.z.mean())['T']
+        #new_state.T += cooling_rate * self.dt
         return new_state
 
 def nucleation_slice(state, S_perturbations, r_min, particle_count):

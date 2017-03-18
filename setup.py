@@ -40,6 +40,7 @@ def model_init(initial_conditions, executer):
         'r_min': r_min,
         'particle_count': particle_count,
         'T': initial_conditions['environment']['T'],
+        'w': initial_conditions['environment']['w'],
         'dt': initial_conditions['dt'],
         't_max': initial_conditions['t_max'],
         'radiation': initial_conditions['radiation'],
@@ -52,5 +53,6 @@ def model_init(initial_conditions, executer):
                          initial_conditions['T'],
                          initial_conditions['p'],
                          initial_conditions['qv'],
-                         (0,)*len(r_min))
+                         np.array([0.] * len(r_min)),
+                         np.array([initial_conditions['environment']['z0']] * len(r_min)))
     return Model(model_parameters, intial_state, executer)

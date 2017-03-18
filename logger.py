@@ -150,18 +150,21 @@ class NetCDFLogger(BaseLogger):
             p_nc = file_handle.createVariable('p', 'f4', (t_dim_nc))
             qv_nc = file_handle.createVariable('qv', 'f4', (t_dim_nc))
             qc_nc = file_handle.createVariable('qc', 'f4', (t_dim_nc, particle_dim_nc))
+            z_nc = file_handle.createVariable('z', 'f4', (t_dim_nc, particle_dim_nc))
 
             time_nc[:] = [state.t for state in self.states]
             T_nc[:] = [state.T for state in self.states]
             p_nc[:] = [state.p for state in self.states]
             qv_nc[:] = [state.qv for state in self.states]
             qc_nc[:] = [state.qc for state in self.states]
+            z_nc[:] = [state.z for state in self.states]
 
             time_nc.units = self.units['t']
             T_nc.units = self.units['T']
             p_nc.units = self.units['p']
             qv_nc.units = self.units['qv']
             qc_nc.units = self.units['qc']
+            z_nc.units = self.units['z']
 
             #TODO specify data type for those variables
             file_handle.distribution = self.informations['type']

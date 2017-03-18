@@ -1,6 +1,7 @@
 import boxmodel_constants as c
 import numpy as np
 from scipy.integrate import odeint
+from scipy.interpolate import interp1d
 
 
 # add second doc string, to the right location
@@ -100,10 +101,9 @@ def optical_thickness(qc, N, r_min):
     tau = 3. / 2. * np.sum(qc) / effective_radius(qc, N, r_min)
     return tau
 
-def dynamic_cooling():
+def dynamic_cooling(w):
     lapse_rate = 10
-    velocity = 0.5
-    return -lapse_rate / 1000. * velocity
+    return -lapse_rate / 1000. * w
 
 #???CHECK???
 def thermal_radiation(T, qc, N, r_min, radiation, T_env=250, math=np):
@@ -165,3 +165,13 @@ def condensation(T, p, qv, qc_sum, qc, particle_count, r_min, dt, E, S_perturbat
 
 def condensation_solver_linear(r_old, dt, E, es, T, S):
     return r_old + dt * differential_growth_by_condensation(r_old, dt, E, es, T, S)
+
+def interp_afglus(file_name):
+    z, p, T, air, o3, o2, h2o, co2, no2 = np.loadtxt(file_name, unpack=True)
+    z *= 1000
+    p *= 100
+    def _interp_afglus(_z):
+        pressure = interp1d(z, p)
+        temperature = interp1d(z, T)
+        return {'z':_z, 'p':pressure(_z), 'T':temperature(_z)}
+    return _interp_afglus
