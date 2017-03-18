@@ -112,7 +112,7 @@ class PlotTimeSeriesLogger(BaseLogger):
         import matplotlib.pyplot as plt
         import numpy as np
         from os.path import join
-        fig, axes = plt.subplots(len(self.quantities))
+        fig, axes = plt.subplots(len(self.quantities), figsize=(7.4, 10))
         for name, storage, ax, unit in zip(self.quantities, self.data, axes, self.units):
             ax.plot(np.array(self.t) / 60., storage)
             ax.set_ylabel('{} [{}]'.format(name, unit))
