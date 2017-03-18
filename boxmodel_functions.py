@@ -137,6 +137,21 @@ def thermal_radiation_using_libRadTran(radiation):
     else:
         return 0
 
+def fall_speed(r):
+    '''approximation found in rogers: Short Course in Cloud Physics p.126'''
+    assert np.all(r >= 0)
+    assert np.all(r < 2.e-3)
+    k1 = 1.19e8
+    k2 = 8e3
+    k3 = 2.01e2
+    m1 = r < 40.e-6
+    m3 = r > 0.6e-3
+    m2 = ~(m1 | m3)
+    r1 = k1 * r**2
+    r2 = k2 * r
+    r3 = k3 * r**0.5
+    return -(m1*r1 + m2*r2 + m3*r3)
+
 def differential_growth_by_condensation(r, t, E_net, es, T, S):
   '''differential diffusional growth equation returning dr/dt [m s-1] from ...units...'''
   c1 = c.H_LAT ** 2 / (c.R_V * c.K * T ** 2) + c.R_V * T / (c.D * es)

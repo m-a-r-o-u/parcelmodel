@@ -86,8 +86,8 @@ def nucleation_slice(state, S_perturbations, r_min, particle_count):
 def step(model, old_state, math=np):
     new_state = model.prepare_new_state(old_state, math=math)
     delta_Ts, delta_qvs, delta_qc = model.calculate_tendencies(new_state, math=math)
-
     new_state.qc = new_state.qc + delta_qc
     new_state.T += math.sum(delta_Ts)
     new_state.qv += math.sum(delta_qvs)
+    new_state.z = new_state.z + bf.fall_speed(bf.radius_with_rmin(new_state.qc, model.particle_count, model.r_min)) * model.dt
     return new_state
