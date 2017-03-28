@@ -92,7 +92,7 @@ class MultiLogger(BaseLogger):
 
 class PlotTimeSeriesLogger(BaseLogger):
     def __init__(self, quantities, file_name='time_series', file_path='./'):
-        self.file_name = file_name + '.png'
+        self.file_name = file_name + '.pdf'
         self.file_path = file_path
         self.units = []
         self.t = []
@@ -151,6 +151,7 @@ class NetCDFLogger(BaseLogger):
             qv_nc = file_handle.createVariable('qv', 'f4', (t_dim_nc))
             qc_nc = file_handle.createVariable('qc', 'f4', (t_dim_nc, particle_dim_nc))
             z_nc = file_handle.createVariable('z', 'f4', (t_dim_nc, particle_dim_nc))
+            E_nc = file_handle.createVariable('E', 'f4', (t_dim_nc, particle_dim_nc))
 
             time_nc[:] = [state.t for state in self.states]
             T_nc[:] = [state.T for state in self.states]
@@ -158,6 +159,7 @@ class NetCDFLogger(BaseLogger):
             qv_nc[:] = [state.qv for state in self.states]
             qc_nc[:] = [state.qc for state in self.states]
             z_nc[:] = [state.z for state in self.states]
+            E_nc[:] = [state.E for state in self.states]
 
             time_nc.units = self.units['t']
             T_nc.units = self.units['T']
@@ -165,6 +167,7 @@ class NetCDFLogger(BaseLogger):
             qv_nc.units = self.units['qv']
             qc_nc.units = self.units['qc']
             z_nc.units = self.units['z']
+            E_nc.units = self.units['E']
 
             #TODO specify data type for those variables
             file_handle.distribution = self.informations['type']

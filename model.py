@@ -11,6 +11,7 @@ class Model(object):
         'qv':'kg kg-1',
         'qc':'kg kg-1',
         'z':'m',
+        'E':'W m-2',
     }
 
     def __init__(self, model_parameters, initial_state, executer):
@@ -20,6 +21,7 @@ class Model(object):
         self.w = model_parameters['w']
         self.T_env = model_parameters['T']
         self.dt = model_parameters['dt']
+        self.dz = model_parameters['dz']
         self.t_max = model_parameters['t_max']
         initial_state = initial_state.copy()
         initial_state.qc = np.array(initial_state.qc, dtype='float')
@@ -55,27 +57,27 @@ class Model(object):
     def calculate_tendencies(self, state, math=np):
         qc_sum = math.sum(state.qc)
         S_perturbations = bf.conservative_gauss_perturbations(self.std, len(self.r_min), self.perturbation)
-        E = bf.thermal_radiation(state.T, state.qc, self.particle_count, self.r_min, self.radiation)
         m = nucleation_slice(state, S_perturbations, self.r_min, self.particle_count)
-        def condensation(qc, particle_count, r_min, S_perturbation):
+        def condensation(qc, particle_count, r_min, S_perturbation, E):
             return bf.condensation(state.T, state.p, state.qv, qc_sum, qc, particle_count, r_min, self.dt, E, S_perturbation, math=math)
         delta_Ts, delta_qvs, delta_qc = np.zeros((3, len(state.qc)))
         delta_Ts[m], delta_qvs[m], delta_qc[m] = condensation(state.qc[m],
                                                               self.particle_count[m],
                                                               self.r_min[m],
-                                                              S_perturbations[m])
+                                                              S_perturbations[m],
+                                                              state.E[m])
         return delta_Ts, delta_qvs, delta_qc
 
     def prepare_new_state(self, old_state, math=np):
         new_state = old_state.copy()
         new_state.t += self.dt
+        print new_state.t
         qc_sum = math.sum(old_state.qc)
-        #cooling_rate = bf.thermal_radiative_cooling_rate(old_state.T, qc_sum, self.T_env)
         cooling_rate = bf.dynamic_cooling(self.w)
         new_state.z = new_state.z + self.w * self.dt
         new_state.p = self.atmosphere(new_state.z.mean())['p']
         new_state.T = self.atmosphere(new_state.z.mean())['T']
-        #new_state.T += cooling_rate * self.dt
+        new_state.E = bf.radiation_using_uvspec(new_state.z, self.dz, new_state.qc, self.particle_count, self.r_min)
         return new_state
 
 def nucleation_slice(state, S_perturbations, r_min, particle_count):

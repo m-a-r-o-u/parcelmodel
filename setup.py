@@ -42,6 +42,7 @@ def model_init(initial_conditions, executer):
         'T': initial_conditions['environment']['T'],
         'w': initial_conditions['environment']['w'],
         'dt': initial_conditions['dt'],
+        'dz': initial_conditions['dz'],
         't_max': initial_conditions['t_max'],
         'radiation': initial_conditions['radiation'],
         'distribution': initial_conditions['particle_distribution'],
@@ -49,10 +50,11 @@ def model_init(initial_conditions, executer):
         'perturbation': initial_conditions['perturbation'],
         'std': initial_conditions['std']
         }
-    intial_state = State(0,
+    initial_state = State(0,
                          initial_conditions['T'],
                          initial_conditions['p'],
                          initial_conditions['qv'],
                          np.array([0.] * len(r_min)),
-                         np.array([initial_conditions['environment']['z0']] * len(r_min)))
-    return Model(model_parameters, intial_state, executer)
+                         np.array([initial_conditions['environment']['z0']] * len(r_min)),
+                         np.array([0.] * len(r_min)))
+    return Model(model_parameters, initial_state, executer)
