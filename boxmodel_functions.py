@@ -7,61 +7,61 @@ from scipy.interpolate import interp1d
 
 # add second doc string, to the right location
 def saturation_pressure(T, math=np):
-  '''Return saturation pressure [Pa] over flat water surface from temperature [K]'''
-  #T_min = 228.15
-  #T_max = 333.15
-  #assert (T_min < T < T_max), "{0} is out range ({1}, {2}) [K] for magnus approximation".format(T, T_min, T_max)
-  es = c.ES0 * math.exp(17.62 * (T - c.T0) / (243.12 + (T - c.T0)))
-  return es
+    '''Return saturation pressure [Pa] over flat water surface from temperature [K]'''
+    #T_min = 228.15
+    #T_max = 333.15
+    #assert (T_min < T < T_max), "{0} is out range ({1}, {2}) [K] for magnus approximation".format(T, T_min, T_max)
+    es = c.ES0 * math.exp(17.62 * (T - c.T0) / (243.12 + (T - c.T0)))
+    return es
 
 def saturation_vapor(T, p, math=np):
-  '''Return saturation mixing ratio [kg kg-1] from T [K] and p [Pa]'''
-  es = saturation_pressure(T, math=math)
-  qvs = c.R_G / c.R_V * es / (p - es)
-  return qvs
+    '''Return saturation mixing ratio [kg kg-1] from T [K] and p [Pa]'''
+    es = saturation_pressure(T, math=math)
+    qvs = c.R_G / c.R_V * es / (p - es)
+    return qvs
 
 def saturation_temperature(p, qv, math=np):
-  '''Return saturation temperature [K] from p [Pa] and qv[kg kg-1]'''
-  x  = qv * c.R_V * p / c.R_G / c.ES0
-  c1 = 1. / c.T0  
-  c2 = c.R_V / c.H_LAT 
-  T  = (c1 - math.log(x) * c2) ** (-1)
-  return T
+    '''Return saturation temperature [K] from p [Pa] and qv[kg kg-1]'''
+    x  = qv * c.R_V * p / c.R_G / c.ES0
+    c1 = 1. / c.T0
+    c2 = c.R_V / c.H_LAT
+    T  = (c1 - math.log(x) * c2) ** (-1)
+    return T
 
 def saturation_adjustment(T, qv, qc, p, math=np):
-  '''Return the state T [K], qv [kg kg-1], qv [kg kg-1] after saturation adjustment'''
-  delqc = math.maximum(0, qv - bf.saturation_vapor(T,p))
-  qc += delqc
-  qv -= delqc
-  T  += delqc * bc.H_LAT / bc.C_P
-  return T,qv,qc
+    '''Return the state T [K], qv [kg kg-1], qv [kg kg-1] after saturation adjustment'''
+    delqc = math.maximum(0, qv - bf.saturation_vapor(T,p))
+    qc += delqc
+    qv -= delqc
+    T  += delqc * bc.H_LAT / bc.C_P
+    return T,qv,qc
 
 def relative_humidity(T,p,qv):
-  '''return the relative humidity'''
-  r = qv / saturation_vapor(T,p)
-  return r
+    '''return the relative humidity'''
+    r = qv / saturation_vapor(T,p)
+    return r
 
 def cloud_water(N, r):
-  '''Return could water [kg kg-1] from number density N [m-3] and radius r [m]'''
-  qc = 4. / 3. * np.pi * r ** 3 * c.RHO_H2O / c.RHO_AIR * N
-  return qc
+    '''Return could water [kg kg-1] from number density N [m-3] and radius r [m]'''
+    qc = 4. / 3. * np.pi * r ** 3 * c.RHO_H2O / c.RHO_AIR * N
+    return qc
 
 def cloud_water_without_rmin(N ,r ,r_min):
     return cloud_water(N, r) - cloud_water(N, r_min)
 
 def radius(qc, N):
-  '''Return mean radius in [m] from qc [kg kg-1] and N [m-3]'''
-  r = (3. / 4. / np.pi * qc * c.RHO_AIR / c.RHO_H2O / N) ** (1./3.)
-  return r
+    '''Return mean radius in [m] from qc [kg kg-1] and N [m-3]'''
+    r = (3. / 4. / np.pi * qc * c.RHO_AIR / c.RHO_H2O / N) ** (1./3.)
+    return r
 
 def radius_with_rmin(qc ,N ,r_min):
     r = (3. / 4. / np.pi * (qc + cloud_water(N, r_min)) * c.RHO_AIR / c.RHO_H2O / N) ** (1./3.)
     return r
 
 def stefan_boltzmann_law(T):
-  '''Return power of a black body [W m-2] from T [K]'''
-  P = c.SIGMA_SB * T ** 4
-  return P
+    '''Return power of a black body [W m-2] from T [K]'''
+    P = c.SIGMA_SB * T ** 4
+    return P
 
 def kelvins_parameter(T=273.15):
     return 2 * c.GAMMA / c.R_V / c.RHO_H2O / T
@@ -118,10 +118,10 @@ def thermal_radiation(T, qc, N, r_min, radiation, T_env=250, math=np):
 
 #???CHECK???
 def thermal_radiative_cooling_rate(T, qc, N, r_min, T_env=250.):
-  '''cooling rate due to radiation [units???] from cloud water mixing ratio [kg kg-1]'''
-  E_net = thermal_radiation(T, qc, N, r_min, T_env=T_env)
-  cooling_rate = - E_net * 80 / 20 / (3600. * 24.)
-  return cooling_rate
+    '''cooling rate due to radiation [units???] from cloud water mixing ratio [kg kg-1]'''
+    E_net = thermal_radiation(T, qc, N, r_min, T_env=T_env)
+    cooling_rate = - E_net * 80 / 20 / (3600. * 24.)
+    return cooling_rate
 
 def thermal_radiative_cooling_rate_using_libRadTran():
     '''Thermal Cloud Top heating rates in [K/s] for a cloud between 1-2 [km] of LWC=0.3 [g/m3], 
@@ -154,18 +154,18 @@ def fall_speed(r):
     return -(m1*r1 + m2*r2 + m3*r3)
 
 def differential_growth_by_condensation(r, t, E_net, es, T, S):
-  '''differential diffusional growth equation returning dr/dt [m s-1] from ...units...'''
-  c1 = c.H_LAT ** 2 / (c.R_V * c.K * T ** 2) + c.R_V * T / (c.D * es)
-  c2 = c.H_LAT / (c.R_V * c.K * T ** 2)
-  r_new = (S / r + c2 * E_net) / (c1 * c.RHO_H2O)
-  return r_new
+    '''differential diffusional growth equation returning dr/dt [m s-1] from ...units...'''
+    c1 = c.H_LAT ** 2 / (c.R_V * c.K * T ** 2) + c.R_V * T / (c.D * es)
+    c2 = c.H_LAT / (c.R_V * c.K * T ** 2)
+    r_new = (S / r + c2 * E_net) / (c1 * c.RHO_H2O)
+    return r_new
 
 def differential_growth_by_condensation_jacobian(r, t, E_net, es, T, S):
-  '''jacobian of differential diffusional growth equation returning dr/dt [m s-1] from ...units...'''
-  c1 = c.H_LAT ** 2 / (c.R_V * c.K * T ** 2) + c.R_V * T / (c.D * es)
-  c2 = c.H_LAT / (c.R_V * c.K * T ** 2)
-  r_new = - S / r ** 2 / (c1 * c.RHO_H2O)
-  return r_new
+    '''jacobian of differential diffusional growth equation returning dr/dt [m s-1] from ...units...'''
+    c1 = c.H_LAT ** 2 / (c.R_V * c.K * T ** 2) + c.R_V * T / (c.D * es)
+    c2 = c.H_LAT / (c.R_V * c.K * T ** 2)
+    r_new = - S / r ** 2 / (c1 * c.RHO_H2O)
+    return r_new
 
 def condensation(T, p, qv, qc_sum, qc, particle_count, r_min, dt, E, S_perturbation, math=np):
     r_old = math.maximum(r_min, radius_with_rmin(qc, particle_count, r_min))
@@ -275,11 +275,6 @@ def link_hight_to_radiation(z, zgrid, r, hr, rho_sp, rho=1):
     res = np.zeros(len(z))
     for i in range(len(m)):
         res[m[i]] = heating_rate_to_Enet(hr[i], r[m[i]], rho_sp, rho=rho)
-#    print 'z: ', z
-#    print 'r: ', r
-#    print 'hr: ', hr
-#    print 'res :', res
-#    print
     return res
 
 def heating_rate_to_Enet(hr, r, rho_sp, rho=1):
