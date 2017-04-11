@@ -5,63 +5,35 @@ from tempfile import NamedTemporaryFile
 from scipy.integrate import odeint
 from scipy.interpolate import interp1d
 
-# add second doc string, to the right location
 def saturation_pressure(T, math=np):
-    '''Return saturation pressure [Pa] over flat water surface from temperature [K]'''
-    #T_min = 228.15
-    #T_max = 333.15
-    #assert (T_min < T < T_max), "{0} is out range ({1}, {2}) [K] for magnus approximation".format(T, T_min, T_max)
-    es = c.ES0 * math.exp(17.62 * (T - c.T0) / (243.12 + (T - c.T0)))
-    return es
+    '''Return saturation pressure [Pa] over flat water surface from temperature [K] valid only between 228.15 - 333.15'''
+    return c.ES0 * math.exp(17.62 * (T - c.T0) / (243.12 + (T - c.T0)))
 
 def saturation_vapor(T, p, math=np):
     '''Return saturation mixing ratio [kg kg-1] from T [K] and p [Pa]'''
     es = saturation_pressure(T, math=math)
-    qvs = c.R_G / c.R_V * es / (p - es)
-    return qvs
-
-def saturation_temperature(p, qv, math=np):
-    '''Return saturation temperature [K] from p [Pa] and qv[kg kg-1]'''
-    x  = qv * c.R_V * p / c.R_G / c.ES0
-    c1 = 1. / c.T0
-    c2 = c.R_V / c.H_LAT
-    T  = (c1 - math.log(x) * c2) ** (-1)
-    return T
-
-def saturation_adjustment(T, qv, qc, p, math=np):
-    '''Return the state T [K], qv [kg kg-1], qv [kg kg-1] after saturation adjustment'''
-    delqc = math.maximum(0, qv - bf.saturation_vapor(T,p))
-    qc += delqc
-    qv -= delqc
-    T  += delqc * bc.H_LAT / bc.C_P
-    return T,qv,qc
+    return c.R_G / c.R_V * es / (p - es)
 
 def relative_humidity(T,p,qv):
-    '''return the relative humidity'''
-    r = qv / saturation_vapor(T,p)
-    return r
+    return qv / saturation_vapor(T,p)
 
-def cloud_water(N, r):
-    '''Return could water [kg kg-1] from number density N [m-3] and radius r [m]'''
-    qc = 4. / 3. * np.pi * r ** 3 * c.RHO_H2O / c.RHO_AIR * N
-    return qc
+def _cloud_water(N, r, rho=c.RHO_AIR):
+    return  4. / 3. * np.pi * r ** 3 * c.RHO_H2O / rho * N
 
-def cloud_water_without_rmin(N ,r ,r_min):
-    return cloud_water(N, r) - cloud_water(N, r_min)
+def cloud_water(N, r, r_min=0., rho=c.RHO_AIR):
+    '''could water mixing ratio [kg kg-1] from number density N [# m-3] and radius r [m]'''
+    return _cloud_water(N, r, rho=rho) - _cloud_water(N, r_min, rho=rho)
 
-def radius(qc, N):
+def _radius(qc, N, rho=c.RHO_AIR):
+    return (3. / 4. / np.pi * qc * rho / c.RHO_H2O / N) ** (1./3.)
+
+def radius(qc ,N ,r_min=0, rho=c.RHO_AIR):
     '''Return mean radius in [m] from qc [kg kg-1] and N [m-3]'''
-    r = (3. / 4. / np.pi * qc * c.RHO_AIR / c.RHO_H2O / N) ** (1./3.)
-    return r
-
-def radius_with_rmin(qc ,N ,r_min):
-    r = (3. / 4. / np.pi * (qc + cloud_water(N, r_min)) * c.RHO_AIR / c.RHO_H2O / N) ** (1./3.)
-    return r
+    return _radius(qc + cloud_water(N, r_min, rho=rho) , N, rho=rho)
 
 def stefan_boltzmann_law(T):
     '''Return power of a black body [W m-2] from T [K]'''
-    P = c.SIGMA_SB * T ** 4
-    return P
+    return c.SIGMA_SB * T ** 4
 
 def kelvins_parameter(T=273.15):
     return 2 * c.GAMMA / c.R_V / c.RHO_H2O / T
@@ -94,7 +66,7 @@ def conservative_gauss_perturbations(std, number, perturbation):
         return np.zeros(number)
 
 def effective_radius(qc ,N ,r_min):
-    return np.sum(radius_with_rmin(qc ,N ,r_min) ** 3) / np.sum(radius_with_rmin(qc, N, r_min) ** 2)
+    return np.sum(radius(qc ,N ,r_min) ** 3) / np.sum(radius(qc, N, r_min) ** 2)
 
 #???CHECK???
 def optical_thickness(qc, N, r_min):
@@ -110,7 +82,7 @@ def dynamic_cooling(w):
 def thermal_radiation(T, qc, N, r_min, radiation, T_env=250, math=np):
     '''thermal radiation [units???] from cloud water mixing ratio [kg kg-1]'''
     if radiation:
-        tau   = optical_thickness(qc, N, r_min)
+        tau = optical_thickness(qc, N, r_min)
         E_net = (stefan_boltzmann_law(T) - stefan_boltzmann_law(T_env))* (1 - math.exp(-tau))
         return E_net
     else:
@@ -157,29 +129,26 @@ def differential_growth_by_condensation(r, t, E_net, es, T, S):
     '''differential diffusional growth equation returning dr/dt [m s-1] from ...units...'''
     c1 = c.H_LAT ** 2 / (c.R_V * c.K * T ** 2) + c.R_V * T / (c.D * es)
     c2 = c.H_LAT / (c.R_V * c.K * T ** 2)
-    r_new = (S / r + c2 * E_net) / (c1 * c.RHO_H2O)
-    return r_new
+    return (S / r + c2 * E_net) / (c1 * c.RHO_H2O)
 
 def differential_growth_by_condensation_jacobian(r, t, E_net, es, T, S):
     '''jacobian of differential diffusional growth equation returning dr/dt [m s-1] from ...units...'''
     c1 = c.H_LAT ** 2 / (c.R_V * c.K * T ** 2) + c.R_V * T / (c.D * es)
     c2 = c.H_LAT / (c.R_V * c.K * T ** 2)
-    r_new = - S / r ** 2 / (c1 * c.RHO_H2O)
-    return r_new
+    return - S / r ** 2 / (c1 * c.RHO_H2O)
 
 def condensation(T, p, qv, qc_sum, qc, particle_count, r_min, dt, E, S_perturbation, math=np):
-    r_old = math.maximum(r_min, radius_with_rmin(qc, particle_count, r_min))
+    r_old = math.maximum(r_min, radius(qc, particle_count, r_min))
     es = saturation_pressure(T)
     S = relative_humidity(T, p, qv) - 1 + S_perturbation
-#    E = thermal_radiation_using_libRadTran(radiation)
-    r_new = condensation_solver_linear(r_old, dt, E, es, T, S)
+    r_new = condensation_solver_euler(r_old, dt, E, es, T, S)
     r_new = math.maximum(r_new, r_min)
-    delta_qc = cloud_water_without_rmin(particle_count, r_new, r_min) - qc
+    delta_qc = cloud_water(particle_count, r_new, r_min) - qc
     delta_T = delta_qc * c.H_LAT / c.C_P
     delta_qv = -delta_qc
     return delta_T, delta_qv, delta_qc
 
-def condensation_solver_linear(r_old, dt, E, es, T, S):
+def condensation_solver_euler(r_old, dt, E, es, T, S):
     return r_old + dt * differential_growth_by_condensation(r_old, dt, E, es, T, S)
 
 def interp_afglus(file_name):
@@ -197,13 +166,11 @@ def cloud_quantities(z, dz, qc, N, r_min):
     zmax = np.max(z) + (dz - np.max(z)%dz)
     zgrid = np.arange(zmin, zmax+dz, dz)
     weights = qc
-    weights2 = radius_with_rmin(qc, N, r_min) ** 2
-    weights3 = radius_with_rmin(qc, N, r_min) ** 3
-
+    weights2 = radius(qc, N, r_min) ** 2
+    weights3 = radius(qc, N, r_min) ** 3
     qc, bin_edge = np.histogram(z, zgrid, weights=weights)
     r2, bin_edge = np.histogram(z, zgrid, weights=weights2)
     r3, bin_edge = np.histogram(z, zgrid, weights=weights3)
-
     m = qc > 0
     r3[m] = r3[m] / r2[m]
     qc = np.append(qc, 0.0)
@@ -284,5 +251,4 @@ def heating_rate_to_Enet(hr, r, rho_sp, rho=1):
 def radiation_using_uvspec(z, dz, qc, particle_count, r_min):
     zgrid, lwc, reff = cloud_quantities(z, dz, qc, particle_count, r_min)
     res = libRadTran_radiation_wrapper_thermal(zgrid, lwc, reff)
-    E_net = link_hight_to_radiation(z, zgrid, radius_with_rmin(qc, particle_count, r_min), res[1], particle_count[0])
-    return E_net
+    return link_hight_to_radiation(z, zgrid, radius(qc, particle_count, r_min), res[1], particle_count[0])

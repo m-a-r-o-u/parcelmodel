@@ -82,7 +82,7 @@ class Model(object):
 
 def nucleation_slice(state, S_perturbations, r_min, particle_count):
     S = bf.relative_humidity(state.T, state.p, state.qv) - 1 + S_perturbations
-    m = (S < bf.critical_super_saturation(r_min, state.T)) & (np.isclose(bf.radius_with_rmin(state.qc, particle_count, r_min), r_min))
+    m = (S < bf.critical_super_saturation(r_min, state.T)) & (np.isclose(bf.radius(state.qc, particle_count, r_min), r_min))
     return [not i for i in m]
 
 def step(model, old_state, math=np):
@@ -91,5 +91,5 @@ def step(model, old_state, math=np):
     new_state.qc = new_state.qc + delta_qc
     new_state.T += math.sum(delta_Ts)
     new_state.qv += math.sum(delta_qvs)
-    new_state.z = new_state.z + bf.fall_speed(bf.radius_with_rmin(new_state.qc, model.particle_count, model.r_min)) * model.dt
+    new_state.z = new_state.z + bf.fall_speed(bf.radius(new_state.qc, model.particle_count, model.r_min)) * model.dt
     return new_state
