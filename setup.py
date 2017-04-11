@@ -1,7 +1,7 @@
 import numpy as np
 from state import State
 from model import Model
-from ccn import create_particle_distribution
+from ccn import choose_particle_distribution
 from radiation import choose_radiation_schema
 
 def model_init(initial_conditions, executer):
