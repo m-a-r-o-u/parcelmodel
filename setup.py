@@ -3,10 +3,12 @@ from state import State
 from model import Model
 from ccn import choose_particle_distribution
 from radiation import choose_radiation_schema
+from turbulence import choose_turbulence_schema
 
 def model_init(initial_conditions, executer):
-    r_min, particle_count = choose_particle_distribution(initial_conditions['particle_distribution'])
+    r_min, particle_count = choose_particle_distribution(initial_conditions)
     radiation_function = choose_radiation_schema(initial_conditions['radiation_schema'])
+    turbulence_schema = choose_turbulence_schema(initial_conditions)
     model_parameters = {
         'r_min': r_min,
         'particle_count': particle_count,
@@ -16,10 +18,10 @@ def model_init(initial_conditions, executer):
         'dz': initial_conditions['dz'],
         't_max': initial_conditions['t_max'],
         'radiation_function': radiation_function,
+        'turbulence_schema': turbulence_schema,
+        #'perturbation': initial_conditions['perturbation'],
         'distribution': initial_conditions['particle_distribution'],
         'output_step': initial_conditions['output_step'],
-        'perturbation': initial_conditions['perturbation'],
-        'std': initial_conditions['std']
         }
     initial_state = State(0,
                          initial_conditions['T'],

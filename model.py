@@ -18,6 +18,7 @@ class Model(object):
         self.microphysics = {'r_min' : np.array(model_parameters['r_min']),
                              'particle_count' : np.array(model_parameters['particle_count'])}
         self.radiation_function = model_parameters['radiation_function']
+        self.turbulence_schema = model_parameters['turbulence_schema']
         self.w = model_parameters['w']
         self.T_env = model_parameters['T']
         self.dt = model_parameters['dt']
@@ -27,12 +28,12 @@ class Model(object):
         initial_state.qc = np.array(initial_state.qc, dtype='float')
         self._initial_state = initial_state
         self.output_step = model_parameters['output_step']
-        self.perturbation = model_parameters.get('perturbation', False)
-        self.std = model_parameters.get('std')
+        #self.perturbation = model_parameters.get('perturbation', False)
+        #self.std = model_parameters.get('std')
         self.information = model_parameters['distribution']
         self.information['radiation'] = False ######################todo
-        self.information['perturbation'] = self.perturbation
-        self.information['std'] = self.std
+        self.information['perturbation'] = False #######################todo
+        #self.information['std'] = self.std
         self.atmosphere = bf.interp_afglus('./input/afglus.dat')
         assert len(self.microphysics['r_min']) == len(self.microphysics['particle_count'])
         assert len(self.microphysics['r_min']) == len(self._initial_state.qc)
@@ -56,7 +57,7 @@ class Model(object):
 
     def calculate_tendencies(self, state, math=np):
         qc_sum = math.sum(state.qc)
-        S_perturbations = bf.conservative_gauss_perturbations(self.std, len(state.qc), self.perturbation)
+        S_perturbations = self.turbulence_schema()
         m = nucleation_slice(state, S_perturbations, self.microphysics)
         def condensation(qc, particle_count, r_min, S_perturbation, E):
             return bf.condensation(state.T, state.p, state.qv, qc_sum, qc, particle_count, r_min, self.dt, E, S_perturbation, math=math)

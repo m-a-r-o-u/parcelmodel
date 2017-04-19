@@ -58,13 +58,6 @@ def critical_super_saturation(r_ccn, T=273.15, math=np):
 def koehler(r, r_ccn, T=273.15, math=np):
     return kelvin_curvature_effect(r, T=T, math=math) * raoult_mixture_effect(r, r_ccn)
 
-def conservative_gauss_perturbations(std, number, perturbation):
-    if perturbation:
-        perturbations = np.random.normal(0., std, number)
-        return perturbations - perturbations.mean()
-    else:
-        return np.zeros(number)
-
 def effective_radius(qc, N, r_min):
     '''Returns a effective radius because of r_min even if qc=0'''
     return np.sum(radius(qc, N, r_min) ** 3) / np.sum(radius(qc ,N ,r_min) ** 2)

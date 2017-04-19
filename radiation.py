@@ -25,11 +25,10 @@ def stefan_boltzmann_schema(state, microphysics):
 def no_radiation(state, microphysics):
     return 0, np.zeros(len(state.qc))
 
-RADIATION_SCHEMA = {
+RADIATION_SCHEMES = {
     'stefan_boltzmann': stefan_boltzmann_schema,
     'no_radiation': no_radiation,
     }
 
 def choose_radiation_schema(definitions):
-#    kwargs = {k:v for k,v in definitions.iteritems() if k != 'type'}
-    return RADIATION_SCHEMA[definitions['type']]#(**kwargs)
+    return RADIATION_SCHEMES[definitions['type']]

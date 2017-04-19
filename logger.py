@@ -175,7 +175,7 @@ class NetCDFLogger(BaseLogger):
             file_handle.sp = self.informations['groups']
             file_handle.radiation = int(self.informations['radiation'])
             file_handle.perturbation = int(self.informations['perturbation'])
-            file_handle.std = self.informations['std']
+            #file_handle.std = self.informations['std']
 
 LOGGERS = {
     'MultiPlotLogger': PlotTimeSeriesLogger,
