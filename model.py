@@ -28,12 +28,9 @@ class Model(object):
         initial_state.qc = np.array(initial_state.qc, dtype='float')
         self._initial_state = initial_state
         self.output_step = model_parameters['output_step']
-        #self.perturbation = model_parameters.get('perturbation', False)
-        #self.std = model_parameters.get('std')
         self.information = model_parameters['distribution']
-        self.information['radiation'] = False ######################todo
-        self.information['perturbation'] = False #######################todo
-        #self.information['std'] = self.std
+        self.information['radiation'] = model_parameters['radiation_function'].__name__
+        self.information['turbulence'] = model_parameters['turbulence_schema'].__name__
         self.atmosphere = bf.interp_afglus('./input/afglus.dat')
         assert len(self.microphysics['r_min']) == len(self.microphysics['particle_count'])
         assert len(self.microphysics['r_min']) == len(self._initial_state.qc)

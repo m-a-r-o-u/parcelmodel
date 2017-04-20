@@ -172,10 +172,8 @@ class NetCDFLogger(BaseLogger):
             #TODO specify data type for those variables
             file_handle.distribution = self.informations['type']
             file_handle.ccn = self.informations['total']
-            file_handle.sp = self.informations['groups']
-            file_handle.radiation = int(self.informations['radiation'])
-            file_handle.perturbation = int(self.informations['perturbation'])
-            #file_handle.std = self.informations['std']
+            file_handle.radiation = self.informations['radiation']
+            file_handle.turbulence = self.informations['turbulence']
 
 LOGGERS = {
     'MultiPlotLogger': PlotTimeSeriesLogger,

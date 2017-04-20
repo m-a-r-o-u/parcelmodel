@@ -2,6 +2,7 @@ import numpy as np
 
 class Markov_schema(object):
     def __init__(self, groups, l, epsilon, dt):
+        self.__name__ = self.__class__.__name__
         self.groups = groups
         self.l = l
         self.epsilon = epsilon
