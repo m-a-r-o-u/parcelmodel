@@ -22,7 +22,6 @@ class Model(object):
         self.w = model_parameters['w']
         self.T_env = model_parameters['T']
         self.dt = model_parameters['dt']
-        self.dz = model_parameters['dz']
         self.t_max = model_parameters['t_max']
         initial_state = initial_state.copy()
         initial_state.qc = np.array(initial_state.qc, dtype='float')

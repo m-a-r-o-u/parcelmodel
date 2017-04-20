@@ -31,6 +31,5 @@ PARTICLE_DISTRIBUTIONS = {
 def choose_particle_distribution(definitions):
     definitions_p = definitions['particle_distribution']
     definitions_p.update({k:v for k, v in definitions.iteritems() if k == 'groups' })
-    print definitions_p
     kwargs = {k:v for k,v in definitions_p.iteritems() if k != 'type'}
     return PARTICLE_DISTRIBUTIONS[definitions_p['type']](**kwargs)

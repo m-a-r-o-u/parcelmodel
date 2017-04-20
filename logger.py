@@ -169,7 +169,6 @@ class NetCDFLogger(BaseLogger):
             z_nc.units = self.units['z']
             E_nc.units = self.units['E']
 
-            #TODO specify data type for those variables
             file_handle.distribution = self.informations['type']
             file_handle.ccn = self.informations['total']
             file_handle.radiation = self.informations['radiation']

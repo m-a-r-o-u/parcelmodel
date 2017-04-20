@@ -15,11 +15,9 @@ def model_init(initial_conditions, executer):
         'T': initial_conditions['environment']['T'],
         'w': initial_conditions['environment']['w'],
         'dt': initial_conditions['dt'],
-        'dz': initial_conditions['dz'],
         't_max': initial_conditions['t_max'],
         'radiation_function': radiation_function,
         'turbulence_schema': turbulence_schema,
-        #'perturbation': initial_conditions['perturbation'],
         'distribution': initial_conditions['particle_distribution'],
         'output_step': initial_conditions['output_step'],
         }
