@@ -53,7 +53,10 @@ class Model(object):
 
     def calculate_tendencies(self, state, math=np):
         qc_sum = math.sum(state.qc)
-        S_perturbations = self.turbulence_schema()
+        S_perturbations = self.turbulence_schema(bf.radius(state.qc,
+                                                           self.microphysics['particle_count'],
+                                                           self.microphysics['r_min']),
+                                                 self.microphysics['particle_count'])
         m = nucleation_slice(state, S_perturbations, self.microphysics)
         def condensation(qc, particle_count, r_min, S_perturbation, E):
             return bf.condensation(state.T, state.p, state.qv, qc_sum, qc, particle_count, r_min, self.dt, E, S_perturbation, math=math)
@@ -74,8 +77,7 @@ class Model(object):
         new_state.z = new_state.z + self.w * self.dt
         new_state.p = self.atmosphere(new_state.z.mean())['p']
         new_state.T = self.atmosphere(new_state.z.mean())['T']
-        heating_rate, new_state.E = self.radiation_function(new_state, self.microphysics)
-        #new_state.E = bf.radiation_using_uvspec(new_state.z, self.dz, new_state.qc, self.particle_count, self.r_min)
+        new_state.E = self.radiation_function(new_state, self.microphysics)
         return new_state
 
 def nucleation_slice(state, S_perturbations, microphysics):

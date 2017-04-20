@@ -1,3 +1,10 @@
+import numpy as np
+import boxmodel_constants as c
+import sh
+from tempfile import NamedTemporaryFile
+from boxmodel_functions import radius
+
+
 def cloud_quantities(z, dz, qc, N, r_min):
     zmin = np.min(z) - np.min(z)%dz
     zmax = np.max(z) + (dz - np.max(z)%dz)
@@ -85,7 +92,11 @@ def heating_rate_to_Enet(hr, r, rho_sp, rho=1):
     r2_total = np.sum(r**2)
     return - hr * c.C_P * rho / 24. / 60. / 60. / r2_total / np.pi / rho_sp
 
-def radiation_using_uvspec(z, dz, qc, particle_count, r_min):
+def thermal_radiation_using_uvspec(dz, state, microphysics):
+    r_min = microphysics['r_min']
+    particle_count = microphysics['particle_count']
+    z = state.z
+    qc = state.qc
     zgrid, lwc, reff = cloud_quantities(z, dz, qc, particle_count, r_min)
     res = libRadTran_radiation_wrapper_thermal(zgrid, lwc, reff)
     return link_hight_to_radiation(z, zgrid, radius(qc, particle_count, r_min), res[1], particle_count[0])

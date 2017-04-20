@@ -1,6 +1,7 @@
 import numpy as np
 from boxmodel_functions import effective_radius
 from boxmodel_functions import stefan_boltzmann_law
+from radiation_libradtran import thermal_radiation_using_uvspec
 
 def optical_thickness(qc, microphysics):
     '''Stephens 1978b'''
@@ -20,15 +21,33 @@ def thermal_radiative_cooling_rate(T, qc, N, r_min, T_env=250.):
 def stefan_boltzmann_schema(state, microphysics):
     #muss noch auf die drops verteilt werden
     E_net = np.array([thermal_radiation(state, microphysics)] * len(state.qc))
-    return 0, E_net
+    return E_net
 
 def no_radiation(state, microphysics):
-    return 0, np.zeros(len(state.qc))
+    return np.zeros(len(state.qc))
+
+def function_wrapper(t):
+    def _f():
+        def _g(state, microphysics):
+            return t(state, microphysics)
+        return _g
+    return _f
+
+def libradtran_wrapper(t):
+    def _f(dz, mode):
+        if mode == 'thermal':
+            def _g(state, microphysics):
+                return t(dz, state, microphysics)
+            return _g
+        else: print 'libradtran_wrapper mode Error'
+    return _f
 
 RADIATION_SCHEMES = {
-    'stefan_boltzmann': stefan_boltzmann_schema,
-    'no_radiation': no_radiation,
+    'libradtran': libradtran_wrapper(thermal_radiation_using_uvspec),
+    'stefan_boltzmann': function_wrapper(stefan_boltzmann_schema),
+    'no_radiation': function_wrapper(no_radiation),
     }
 
 def choose_radiation_schema(definitions):
-    return RADIATION_SCHEMES[definitions['type']]
+    kwargs = {k:v for k,v in definitions.iteritems() if k != 'type'}
+    return RADIATION_SCHEMES[definitions['type']](**kwargs)
