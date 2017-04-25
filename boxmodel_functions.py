@@ -1,5 +1,7 @@
 import boxmodel_constants as c
 import numpy as np
+import sh
+from tempfile import NamedTemporaryFile
 from scipy.integrate import odeint
 from scipy.interpolate import interp1d
 
