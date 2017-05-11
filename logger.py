@@ -1,4 +1,5 @@
 from system_utils import check_make_directory
+import numpy as np
 
 def logger_factory(config):
     if isinstance(config, list):
@@ -15,7 +16,7 @@ class BaseLogger(object):
     def set_units(self, units):
         pass
 
-    def set_informations(self, infos):
+    def inform(self, infos):
         pass
 
     def finalize(self):
@@ -78,9 +79,9 @@ class MultiLogger(BaseLogger):
         for logger in self.loggers:
             logger.set_units(units)
 
-    def set_informations(self, infos):
+    def inform(self, init_con):
         for logger in self.loggers:
-            logger.set_informations(infos)
+            logger.inform(init_con)
 
     def log_state(self, state):
         for logger in self.loggers:
@@ -110,7 +111,6 @@ class PlotTimeSeriesLogger(BaseLogger):
 
     def finalize(self):
         import matplotlib.pyplot as plt
-        import numpy as np
         from os.path import join
         fig, axes = plt.subplots(len(self.quantities), figsize=(7.4, 10))
         for name, storage, ax, unit in zip(self.quantities, self.data, axes, self.units):
@@ -124,15 +124,15 @@ class NetCDFLogger(BaseLogger):
         self.file_path = file_path
         self.file_name = file_name + '.nc'
         self.units = {}
-        self.informations = {}
         self.states = []
+        self.initial_conditions = None
         check_make_directory(self.file_path)
 
     def set_units(self, units):
         self.units = units
 
-    def set_informations(self, infos):
-        self.informations = infos
+    def inform(self, init_con):
+        self.initial_conditions = init_con
 
     def log_state(self, state):
         self.states.append(state)
@@ -140,7 +140,7 @@ class NetCDFLogger(BaseLogger):
     def finalize(self):
         from netCDF4 import Dataset
         from os.path import join
-        with Dataset(join(self.file_path, self.file_name), mode='w', format='NETCDF3_64BIT') as file_handle:
+        with Dataset(join(self.file_path, self.file_name), mode='w', format='NETCDF4') as file_handle:
             t_dim_nc = 'time'
             particle_dim_nc = 'super_particles'
             file_handle.createDimension(t_dim_nc, len(self.states))
@@ -169,10 +169,21 @@ class NetCDFLogger(BaseLogger):
             z_nc.units = self.units['z']
             E_nc.units = self.units['E']
 
-            file_handle.distribution = self.informations['type']
-            file_handle.ccn = self.informations['total']
-            file_handle.radiation = self.informations['radiation']
-            file_handle.turbulence = self.informations['turbulence']
+            file_handle.ccn = self.initial_conditions['particle_distribution']['total']
+            file_handle.w = self.initial_conditions['w']
+            file_handle.l = self.initial_conditions['l']
+            file_handle.z0 = self.initial_conditions['z0']
+
+            create_group_for('radiation_schema', self, file_handle)
+            create_group_for('particle_distribution', self, file_handle)
+            create_group_for('turbulence_schema', self, file_handle)
+            create_group_for('atmosphere_schema', self, file_handle)
+
+
+def create_group_for(string, logger, file_handle):
+    params = file_handle.createGroup(string)
+    for k, v in logger.initial_conditions[string].iteritems():
+        setattr(params, k, v)
 
 LOGGERS = {
     'MultiPlotLogger': PlotTimeSeriesLogger,

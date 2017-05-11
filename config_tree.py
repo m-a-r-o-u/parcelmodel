@@ -56,4 +56,3 @@ def logger_config(config):
     modified_config = set_timestamp(config)
     modified_config = set_global_path(modified_config)
     return modified_config['output']['logger']
-

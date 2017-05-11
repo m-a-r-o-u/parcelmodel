@@ -22,14 +22,24 @@ def marine_ccn_particle_distribution(file_name, total, groups):
     particle_count = (total / groups, ) * groups
     return r_min*1.e-6, particle_count
 
+def double_log_normal(ratio, mu1, sigma1, mu2, sigma2, total, groups):
+    n1 = int(ratio * groups)
+    n2 = groups - n1
+    r_ccn1 = np.random.lognormal(np.log(mu1), sigma1, n1)
+    r_ccn2 = np.random.lognormal(np.log(mu2), sigma2, n2)
+    r_min = np.concatenate((r_ccn1, r_ccn2))
+    particle_count = (total / groups, ) * groups
+    return r_min, particle_count
+
 PARTICLE_DISTRIBUTIONS = {
     'uniform': uniform_particle_distribution,
     'explicit': explicit_particle_distribution,
     'marine_ccn': marine_ccn_particle_distribution,
+    'double_log_normal': double_log_normal,
     }
 
 def choose_particle_distribution(definitions):
-    definitions_p = definitions['particle_distribution']
+    definitions_p = dict(definitions['particle_distribution'])
     definitions_p.update({k:v for k, v in definitions.iteritems() if k == 'groups' })
     kwargs = {k:v for k,v in definitions_p.iteritems() if k != 'type'}
     return PARTICLE_DISTRIBUTIONS[definitions_p['type']](**kwargs)

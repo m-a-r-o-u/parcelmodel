@@ -19,9 +19,10 @@ class Markov_schema(object):
 
     def S_step(self, r=np.array([10.e-6]), N=np.array([100.e6])):
         S = self.S
-        self.S = self.saturation_fluctuations(r, N)
+        self.S = S + self.saturation_fluctuations(r, N)
         tke = self.sgs_tke()
-        self.w = self.ornstein_uhlenbeck_process(self.turbulent_timescale(tke), self.std_deviation_w(tke))
+        self.w = self.ornstein_uhlenbeck_process(self.turbulent_timescale(tke), 
+                                                 self.std_deviation_w(tke))
         return S
     
     def sgs_tke(self, Ce=0.845):

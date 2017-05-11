@@ -3,7 +3,6 @@ import numpy as np
 import sh
 from tempfile import NamedTemporaryFile
 from scipy.integrate import odeint
-from scipy.interpolate import interp1d
 
 def saturation_pressure(T, math=np):
     '''Return saturation pressure [Pa] over flat water surface from temperature [K] valid only between 228.15 - 333.15'''
@@ -102,17 +101,7 @@ def condensation(T, p, qv, qc_sum, qc, particle_count, r_min, dt, E, S_perturbat
     delta_qc = cloud_water(particle_count, r_new, r_min) - qc
     delta_T = delta_qc * c.H_LAT / c.C_P
     delta_qv = -delta_qc
-    return delta_T, delta_qv, delta_qc
+    return np.array(delta_T), np.array(delta_qv), np.array(delta_qc)
 
 def condensation_solver_euler(r_old, dt, E, es, T, S):
-    return r_old + dt * differential_growth_by_condensation(r_old, dt, E, es, T, S)
-
-def interp_afglus(file_name):
-    z, p, T, air, o3, o2, h2o, co2, no2 = np.loadtxt(file_name, unpack=True)
-    z *= 1000
-    p *= 100
-    def _interp_afglus(_z):
-        pressure = interp1d(z, p)
-        temperature = interp1d(z, T)
-        return {'z':_z, 'p':pressure(_z), 'T':temperature(_z)}
-    return _interp_afglus
+    return r_old + dt * differential_growth_by_condensation(r_old, None, E, es, T, S)

@@ -11,6 +11,7 @@ def main():
     config = yaml.load( open(args.yaml) )
     model = model_init(config['initial_conditions'], executer.DISPATCHER[config['globals']['executer']])
     with logger_factory(logger_config(config)) as logger:
+        logger.inform(config['initial_conditions'])
         model.run(logger)
 
 if __name__ == "__main__":
