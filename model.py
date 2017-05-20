@@ -21,6 +21,8 @@ class Model(object):
                          'turbulence': model_parameters['turbulence_schema'],
                          'atmosphere': model_parameters['atmosphere_schema']}
         self.w = model_parameters['w']
+        self.l = model_parameters['l']
+        self.feedback = model_parameters['feedback']
         self.dt = model_parameters['dt']
         self.t_max = model_parameters['t_max']
         initial_state = initial_state.copy()
@@ -51,25 +53,11 @@ class Model(object):
         qc_sum = math.sum(state.qc)
         if qc_sum > 0.0:
             S_perturbations = self.schemata['turbulence'](bf.radius(state.qc,
-                                                                    self.microphysics['particle_count'],
-                                                                    self.microphysics['r_min']),
-                                                          self.microphysics['particle_count'])
+                                                                self.microphysics['particle_count'],
+                                                                self.microphysics['r_min']),
+                                                      self.microphysics['particle_count'])
         else:
             S_perturbations = np.zeros(len(state.qc))
-
-        delta_Ts_act, delta_qvs_act, delta_qc_act = np.zeros((3, len(state.qc)))
-#        S = bf.relative_humidity(state.T, state.p, state.qv) - 1 + S_perturbations
-#        m_act = np.isclose(state.qc, 0) & (S > bf.critical_super_saturation(self.microphysics['r_min'], state.T))
-#
-#        r_act = 2. / 3. * bf.kelvins_parameter(state.T) / bf.critical_super_saturation(self.microphysics['r_min'][m_act], state.T)
-#        delta_qc_act[m_act] = bf.cloud_water(self.microphysics['particle_count'][m_act], 
-#                r_act,
-#                self.microphysics['r_min'][m_act])
-#        delta_qvs_act[m_act] = -delta_qc_act[m_act]
-#        import boxmodel_constants as c
-#        delta_Ts_act[m_act] = delta_qc_act[m_act] * c.H_LAT / c.C_P
-#
-#        #if np.any(m_act) : print m_act, np.max(r_act), np.mean(self.microphysics['r_min']), state.t
 
 
         def condensation(qc, particle_count, r_min, S_perturbation, E):
@@ -80,8 +68,10 @@ class Model(object):
                                                               self.microphysics['particle_count'][m],
                                                               self.microphysics['r_min'][m],
                                                               S_perturbations[m],
-                                                              state.E[0])
-        return delta_Ts + delta_Ts_act, delta_qvs + delta_qvs_act, delta_qc + delta_qc_act
+                                                              state.E)
+
+        delta_Ts_E = -(state.E * self.dt / bc.C_P / bc.RHO_AIR / self.l) * min(qc_sum * 1.e12, 1.)
+        return delta_Ts * self.feedback['latent_heat'], delta_qvs, delta_qc, delta_Ts_E * self.feedback['radiation']
 
     def prepare_new_state(self, old_state, math=np):
         new_state = old_state.copy()
@@ -105,9 +95,9 @@ def nucleation_slice(state, S_perturbations, microphysics):
 
 def step(model, old_state, math=np):
     new_state = model.prepare_new_state(old_state, math=math)
-    delta_Ts, delta_qvs, delta_qc = model.calculate_tendencies(new_state, math=math)
+    delta_Ts, delta_qvs, delta_qc, delta_T_E = model.calculate_tendencies(new_state, math=math)
     new_state.qc = new_state.qc + delta_qc
-    new_state.T += math.sum(delta_Ts)
+    new_state.T += math.sum(delta_Ts) + delta_T_E
     new_state.qv += math.sum(delta_qvs)
     new_state.z = new_state.z + bf.fall_speed(bf.radius(new_state.qc, model.microphysics['particle_count'], model.microphysics['r_min'])) * model.dt
     return new_state

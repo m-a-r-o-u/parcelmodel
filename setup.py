@@ -16,6 +16,8 @@ def model_init(initial_conditions, executer):
         'r_min': r_min,
         'particle_count': particle_count,
         'w': initial_conditions['w'],
+        'l': initial_conditions['l'],
+        'feedback': initial_conditions['feedback'],
         'dt': initial_conditions['dt'],
         't_max': initial_conditions['t_max'],
         'output_step': max(initial_conditions['output_step'], initial_conditions['dt']),
@@ -30,5 +32,5 @@ def model_init(initial_conditions, executer):
                          initial_conditions['qv'],
                          np.array([0.] * len(r_min)),
                          np.array([initial_conditions['z0']] * len(r_min)),
-                         np.array([0.] * len(r_min)))
+                         0)
     return Model(model_parameters, initial_state, executer)

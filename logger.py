@@ -151,7 +151,7 @@ class NetCDFLogger(BaseLogger):
             qv_nc = file_handle.createVariable('qv', 'f4', (t_dim_nc))
             qc_nc = file_handle.createVariable('qc', 'f4', (t_dim_nc, particle_dim_nc))
             z_nc = file_handle.createVariable('z', 'f4', (t_dim_nc, particle_dim_nc))
-            E_nc = file_handle.createVariable('E', 'f4', (t_dim_nc, particle_dim_nc))
+            E_nc = file_handle.createVariable('E', 'f4', (t_dim_nc))
 
             time_nc[:] = [state.t for state in self.states]
             T_nc[:] = [state.T for state in self.states]
@@ -171,6 +171,8 @@ class NetCDFLogger(BaseLogger):
 
             file_handle.ccn = self.initial_conditions['particle_distribution']['total']
             file_handle.w = self.initial_conditions['w']
+            file_handle.r = self.initial_conditions['radiation_schema']['factor']
+            file_handle.epsilon = self.initial_conditions['turbulence_schema']['epsilon']
             file_handle.l = self.initial_conditions['l']
             file_handle.z0 = self.initial_conditions['z0']
 
@@ -178,7 +180,7 @@ class NetCDFLogger(BaseLogger):
             create_group_for('particle_distribution', self, file_handle)
             create_group_for('turbulence_schema', self, file_handle)
             create_group_for('atmosphere_schema', self, file_handle)
-
+            create_group_for('feedback', self, file_handle)
 
 def create_group_for(string, logger, file_handle):
     params = file_handle.createGroup(string)
