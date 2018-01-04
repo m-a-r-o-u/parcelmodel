@@ -1,7 +1,7 @@
 import numpy as np
 
 class Markov_schema(object):
-    def __init__(self, groups, l, epsilon, dt):
+    def __init__(self, groups, l, epsilon, dt, gen = np.random.RandomState()):
         self.__name__ = self.__class__.__name__
         self.groups = groups
         self.l = l
@@ -10,6 +10,7 @@ class Markov_schema(object):
         self.S = np.zeros(groups)
         self.dt = min(dt, 0.02)
         self.n_average = max(int(dt / 0.02), 1)
+        self.gen = gen
 
     def __call__(self, r=np.array([10.e-6]), N=np.array([100.e6])):
         S_average = np.zeros(self.groups)
@@ -35,7 +36,7 @@ class Markov_schema(object):
         return (2. / 3. * tke) ** (1. / 2.)
     
     def ornstein_uhlenbeck_process(self, tau, sigma):
-        return self.w * np.exp(-self.dt / tau) + (1 - np.exp(-2. * self.dt / tau)) ** (1. / 2.) * sigma * np.random.normal(0., 1., self.groups)
+        return self.w * np.exp(-self.dt / tau) + (1 - np.exp(-2. * self.dt / tau)) ** (1. / 2.) * sigma * self.gen.normal(0., 1., self.groups)
     
     def saturation_fluctuations(self, r, N):
         A1 = 3.e-4
