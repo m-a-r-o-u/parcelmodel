@@ -1,8 +1,5 @@
 import boxmodel_constants as c
 import numpy as np
-import sh
-from tempfile import NamedTemporaryFile
-from scipy.integrate import odeint
 
 def saturation_pressure(T, math=np):
     '''Return saturation pressure [Pa] over flat water surface from temperature [K] valid only between 228.15 - 333.15'''
@@ -36,6 +33,10 @@ def stefan_boltzmann_law(T):
 
 def kelvins_parameter(T=273.15):
     return 2 * c.GAMMA / c.R_V / c.RHO_H2O / T
+#the seconf return variant may be correct
+#but leads to incorrect results
+#there fore it is left out and but  must be checked
+    #return 2 * c.GAMMA * c.M_MOL_H2O / c.R_V / c.RHO_H2O / T
 
 def kelvin_curvature_effect(r, T=273.15, math=np):
     A = kelvins_parameter(T=T)
