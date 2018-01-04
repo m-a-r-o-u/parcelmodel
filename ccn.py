@@ -29,6 +29,9 @@ def double_log_normal(ratio, mu1, sigma1, mu2, sigma2, total, groups):
     r_ccn2 = np.random.lognormal(np.log(mu2), sigma2, n2)
     r_min = np.concatenate((r_ccn1, r_ccn2))
     particle_count = (total / groups, ) * groups
+    rmx=1.e-6
+    print("try out maximal r_ccn of: " + str(rmx))
+    r_min[r_min>rmx] = rmx
     return r_min, particle_count
 
 PARTICLE_DISTRIBUTIONS = {
