@@ -24,7 +24,7 @@ class Model(object):
         self.l = model_parameters['l']
         self.feedback = model_parameters['feedback']
         self.dt = model_parameters['dt']
-        self.t_max = model_parameters['t_max']
+        self.t_max = int(model_parameters['t_max'])
         initial_state = initial_state.copy()
         initial_state.qc = np.array(initial_state.qc, dtype='float')
         self._initial_state = initial_state
