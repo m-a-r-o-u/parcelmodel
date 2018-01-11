@@ -32,11 +32,14 @@ def stefan_boltzmann_law(T):
     return c.SIGMA_SB * T ** 4
 
 def kelvins_parameter(T=273.15):
+    '''
+    Informations are taken from the book:
+    A short Course in Cloud Physics
+    by
+    Rogers and Yau
+    page: 89
+    '''
     return 2 * c.GAMMA / c.R_V / c.RHO_H2O / T
-#the seconf return variant may be correct
-#but leads to incorrect results
-#there fore it is left out and but  must be checked
-    #return 2 * c.GAMMA * c.M_MOL_H2O / c.R_V / c.RHO_H2O / T
 
 def kelvin_curvature_effect(r, T=273.15, math=np):
     A = kelvins_parameter(T=T)
