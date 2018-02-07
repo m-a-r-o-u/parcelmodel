@@ -12,6 +12,7 @@ class Model(object):
         'qc':'kg kg-1',
         'z':'m',
         'E':'W m-2',
+        'age':'s',
     }
 
     def __init__(self, model_parameters, initial_state, executer):
@@ -71,7 +72,9 @@ class Model(object):
                                                               state.E)
 
         delta_Ts_E = -(state.E * self.dt / bc.C_P / bc.RHO_AIR / self.l) * min(qc_sum * 1.e12, 1.)
-        return delta_Ts * self.feedback['latent_heat'], delta_qvs, delta_qc, delta_Ts_E * self.feedback['radiation']
+        delta_age = np.array([0.]*len(self.microphysics['particle_count']))
+        delta_age[m] += self.dt
+        return delta_Ts * self.feedback['latent_heat'], delta_qvs, delta_qc, delta_Ts_E * self.feedback['radiation'], delta_age
 
     def prepare_new_state(self, old_state, math=np):
         new_state = old_state.copy()
@@ -95,9 +98,11 @@ def nucleation_slice(state, S_perturbations, microphysics):
 
 def step(model, old_state, math=np):
     new_state = model.prepare_new_state(old_state, math=math)
-    delta_Ts, delta_qvs, delta_qc, delta_T_E = model.calculate_tendencies(new_state, math=math)
+    delta_Ts, delta_qvs, delta_qc, delta_T_E, delta_age = model.calculate_tendencies(new_state, math=math)
     new_state.qc = new_state.qc + delta_qc
     new_state.T += math.sum(delta_Ts) + delta_T_E
     new_state.qv += math.sum(delta_qvs)
     new_state.z = new_state.z + bf.fall_speed(bf.radius(new_state.qc, model.microphysics['particle_count'], model.microphysics['r_min'])) * model.dt
+    new_state.age[delta_age<=0.] = 0.
+    new_state.age = new_state.age + delta_age
     return new_state

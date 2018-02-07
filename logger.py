@@ -152,6 +152,7 @@ class NetCDFLogger(BaseLogger):
             qc_nc = file_handle.createVariable('qc', 'f4', (t_dim_nc, particle_dim_nc))
             z_nc = file_handle.createVariable('z', 'f4', (t_dim_nc, particle_dim_nc))
             E_nc = file_handle.createVariable('E', 'f4', (t_dim_nc))
+            age_nc = file_handle.createVariable('age', 'f4', (t_dim_nc, particle_dim_nc))
 
             time_nc[:] = [state.t for state in self.states]
             T_nc[:] = [state.T for state in self.states]
@@ -160,6 +161,7 @@ class NetCDFLogger(BaseLogger):
             qc_nc[:] = [state.qc for state in self.states]
             z_nc[:] = [state.z for state in self.states]
             E_nc[:] = [state.E for state in self.states]
+            age_nc[:] = [state.age for state in self.states]
 
             time_nc.units = self.units['t']
             T_nc.units = self.units['T']
@@ -168,6 +170,7 @@ class NetCDFLogger(BaseLogger):
             qc_nc.units = self.units['qc']
             z_nc.units = self.units['z']
             E_nc.units = self.units['E']
+            age_nc.units = self.units['age']
 
             file_handle.ccn = self.initial_conditions['particle_distribution']['total']
             file_handle.w = self.initial_conditions['w']
@@ -175,6 +178,7 @@ class NetCDFLogger(BaseLogger):
             file_handle.epsilon = self.initial_conditions['turbulence_schema']['epsilon']
             file_handle.l = self.initial_conditions['l']
             file_handle.z0 = self.initial_conditions['z0']
+            file_handle.factor = self.initial_conditions['radiation_schema']['factor']
 
             create_group_for('radiation_schema', self, file_handle)
             create_group_for('particle_distribution', self, file_handle)
