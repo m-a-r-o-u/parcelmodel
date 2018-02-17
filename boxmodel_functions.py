@@ -84,16 +84,22 @@ def fall_speed(r):
     r3 = k3 * r**0.5
     return -(m1*r1 + m2*r2 + m3*r3)
 
+def c2_differential_growth_by_condensation(T, es):
+    return c.H_LAT / (c.R_V * c.K * T ** 2)
+
+def c1_differential_growth_by_condensation(T, es):
+    return c.H_LAT ** 2 / (c.R_V * c.K * T ** 2) + c.R_V * T / (c.D * es)
+
 def differential_growth_by_condensation(r, t, E_net, es, T, S):
     '''differential diffusional growth equation returning dr/dt [m s-1] from ...units...'''
-    c1 = c.H_LAT ** 2 / (c.R_V * c.K * T ** 2) + c.R_V * T / (c.D * es)
-    c2 = c.H_LAT / (c.R_V * c.K * T ** 2)
+    c1 = c1_differential_growth_by_condensation(T, es)
+    c2 = c2_differential_growth_by_condensation(T, es)
     return (S / r + c2 * E_net) / (c1 * c.RHO_H2O)
 
 def differential_growth_by_condensation_jacobian(r, t, E_net, es, T, S):
     '''jacobian of differential diffusional growth equation returning dr/dt [m s-1] from ...units...'''
-    c1 = c.H_LAT ** 2 / (c.R_V * c.K * T ** 2) + c.R_V * T / (c.D * es)
-    c2 = c.H_LAT / (c.R_V * c.K * T ** 2)
+    c1 = c1_differential_growth_by_condensation(T, es)
+    c2 = c2_differential_growth_by_condensation(T, es)
     return - S / r ** 2 / (c1 * c.RHO_H2O)
 
 def condensation(T, p, qv, qc_sum, qc, particle_count, r_min, dt, E, S_perturbation, math=np):
