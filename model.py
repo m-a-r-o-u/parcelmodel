@@ -71,7 +71,7 @@ class Model(object):
                                                               S_perturbations[m],
                                                               state.E)
 
-        delta_Ts_E = -(state.E * self.dt / bc.C_P / bc.RHO_AIR / self.l) * min(qc_sum * 1.e12, 1.)
+        delta_Ts_E = -(state.E * self.dt / bc.C_P / bc.RHO_AIR / self.l)
         delta_age = np.array([0.]*len(self.microphysics['particle_count']))
         delta_age[m] += self.dt
         return delta_Ts * self.feedback['latent_heat'], delta_qvs, delta_qc, delta_Ts_E * self.feedback['radiation'], delta_age

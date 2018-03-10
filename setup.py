@@ -16,7 +16,7 @@ def model_init(initial_conditions, executer):
         'r_min': r_min,
         'particle_count': particle_count,
         'w': initial_conditions['w'],
-        'l': initial_conditions['l'],
+        'l': float(initial_conditions['l']),
         'feedback': initial_conditions['feedback'],
         'dt': initial_conditions['dt'],
         't_max': initial_conditions['t_max'],

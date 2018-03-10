@@ -28,7 +28,7 @@ def stefan_boltzmann_schema(state, microphysics, factor, dz):
     #return np.array([E_net] * len(state.qc))
 
 def stefan_boltzmann_wrapper(f):
-    def _f(factor=1, l=100):
+    def _f(factor, l):
         def stefan_boltzmann_schema(state, microphysics):
             return f(state, microphysics, factor, l)
         return stefan_boltzmann_schema
