@@ -20,7 +20,7 @@ def model_init(initial_conditions, executer):
         'feedback': initial_conditions['feedback'],
         'dt': initial_conditions['dt'],
         't_max': initial_conditions['t_max'],
-        'output_step': max(initial_conditions['output_step'], initial_conditions['dt']),
+        'dt_output': max(initial_conditions['dt_output'], initial_conditions['dt']),
         'radiation_function': radiation_function,
         'turbulence_schema': turbulence_schema,
         'atmosphere_schema': atmosphere_schema,

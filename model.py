@@ -29,10 +29,10 @@ class Model(object):
         initial_state = initial_state.copy()
         initial_state.qc = np.array(initial_state.qc, dtype='float')
         self._initial_state = initial_state
-        self.output_step = model_parameters['output_step']
+        self.dt_output = model_parameters['dt_output']
         assert len(self.microphysics['r_min']) == len(self.microphysics['particle_count'])
         assert len(self.microphysics['r_min']) == len(self._initial_state.qc)
-        self.executer = executer(step, self, initial_state, int(self.output_step / float(self.dt)))
+        self.executer = executer(step, self, initial_state, int(self.dt_output / float(self.dt)))
         self.step = self.executer.step
 
     def run(self, logger):
