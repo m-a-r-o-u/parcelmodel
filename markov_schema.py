@@ -1,6 +1,13 @@
 import numpy as np
 
 class Markov_schema(object):
+    '''
+    The Markov_schema object parametrizes saturation fluctuations
+
+    :param groups: Initialize internal arrays, that hold S, w for each particle
+    :type groups: Integer?
+    :ivar groups: This is where we store groups
+    '''
     def __init__(self, groups, l, epsilon, dt, gen = np.random.RandomState()):
         self.__name__ = self.__class__.__name__
         self.groups = groups
