@@ -1,6 +1,10 @@
 import boxmodel_constants as c
 import numpy as np
 
+def stokes_falling_speed(r):
+    '''return falling speed for water sphere in air'''
+    return 2. / 9. * r * r * c.G * (c.RHO_H2O - c.RHO_AIR) / c.ETA_AIR
+
 def saturation_pressure(T, math=np):
     '''Return saturation pressure [Pa] over flat water surface from temperature [K] valid only between 228.15 - 333.15'''
     return c.ES0 * math.exp(17.62 * (T - c.T0) / (243.12 + (T - c.T0)))
@@ -115,3 +119,13 @@ def condensation(T, p, qv, qc_sum, qc, particle_count, r_min, dt, E, S_perturbat
 
 def condensation_solver_euler(r_old, dt, E, es, T, S):
     return r_old + dt * differential_growth_by_condensation(r_old, None, E, es, T, S)
+
+def planck(l, T):
+    '''power of planck radiation per wavelength in W/(m2 m)'''
+    c1 = 2. * np.pi * c.H_PLANCK * c.C * c.C
+    c2 = c.H_PLANCK * c.C / c.K_BOLTZ
+    return c1 / (l*l*l*l*l) * 1 / (np.exp(c2 / (l * T)) - 1)
+
+def diffusion_solution_classic(t, S, T, es):
+    A = c1_differential_growth_by_condensation(T, es)
+    return np.sqrt(2. * S * t / A / bc.RHO_H2O)
