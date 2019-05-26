@@ -82,7 +82,8 @@ class Model(object):
         qc_sum = math.sum(old_state.qc)
         cooling_rate = bf.dynamic_cooling(self.w)
         dz = self.w * self.dt
-        new_state.p, new_state.T, new_state.z = self.schemata['atmosphere'](old_state.p,
+        new_state.z += dz
+        new_state.p, new_state.T, _z = self.schemata['atmosphere'](old_state.p,
                                                           old_state.T,
                                                           np.mean(old_state.z),
                                                           dz)
