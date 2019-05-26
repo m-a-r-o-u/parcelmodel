@@ -75,7 +75,7 @@ def dynamic_cooling(w):
 
 def fall_speed(r):
     '''approximation found in rogers: Short Course in Cloud Physics p.126'''
-    assert np.all(r >= 0)
+    assert np.all(r >= 0), 'r is {}'.format(r)
     assert np.all(r < 2.e-3)
     k1 = 1.19e8
     k2 = 8e3
