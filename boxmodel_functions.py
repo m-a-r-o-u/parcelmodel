@@ -86,13 +86,17 @@ def fall_speed(r):
     k1 = 1.19e8
     k2 = 8e3
     k3 = 2.01e2
+
     m1 = r < 40.e-6
+    m2 = r >= 40.e-6
+    m2 &= r < 0.6e-3
     m3 = r > 0.6e-3
-    m2 = ~(m1 | m3)
+
     r1 = k1 * r**2
     r2 = k2 * r
     r3 = k3 * r**0.5
-    return -(m1*r1 + m2*r2 + m3*r3)
+
+    return m1*r1 + m2*r2 + m3*r3
 
 def c2_differential_growth_by_condensation(T, es):
     return c.H_LAT / (c.R_V * c.K * T ** 2)
