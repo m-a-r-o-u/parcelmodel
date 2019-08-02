@@ -5,3 +5,6 @@
 *.yaml
 *.nc
 plot*.py
+bin/
+misc/
+script/
