@@ -33,6 +33,7 @@ def model_init(initial_conditions, executer):
                          np.array([0.] * len(r_min)),
                          np.array([initial_conditions['z0']] * len(r_min)),
                          0,
+                         np.array([0.] * len(r_min)),
                          np.array([0.] * len(r_min))
                          )
     return Model(model_parameters, initial_state, executer)

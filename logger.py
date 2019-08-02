@@ -153,6 +153,7 @@ class NetCDFLogger(BaseLogger):
             z_nc = file_handle.createVariable('z', 'f4', (t_dim_nc, particle_dim_nc))
             E_nc = file_handle.createVariable('E', 'f4', (t_dim_nc))
             age_nc = file_handle.createVariable('age', 'f4', (t_dim_nc, particle_dim_nc))
+            Sprime_nc = file_handle.createVariable('Sprime', 'f4', (t_dim_nc, particle_dim_nc))
 
             time_nc[:] = [state.t for state in self.states]
             T_nc[:] = [state.T for state in self.states]
@@ -162,6 +163,7 @@ class NetCDFLogger(BaseLogger):
             z_nc[:] = [state.z for state in self.states]
             E_nc[:] = [state.E for state in self.states]
             age_nc[:] = [state.age for state in self.states]
+            Sprime_nc[:] = [state.Sprime for state in self.states]
 
             time_nc.units = self.units['t']
             T_nc.units = self.units['T']
@@ -171,6 +173,7 @@ class NetCDFLogger(BaseLogger):
             z_nc.units = self.units['z']
             E_nc.units = self.units['E']
             age_nc.units = self.units['age']
+            Sprime_nc.units = ''
 
             file_handle.ccn = self.initial_conditions['particle_distribution']['total']
             file_handle.w = self.initial_conditions['w']

@@ -52,23 +52,14 @@ class Model(object):
 
     def calculate_tendencies(self, state, math=np):
         qc_sum = math.sum(state.qc)
-        if qc_sum > 0.0:
-            S_perturbations = self.schemata['turbulence'](bf.radius(state.qc,
-                                                                self.microphysics['particle_count'],
-                                                                self.microphysics['r_min']),
-                                                      self.microphysics['particle_count'])
-        else:
-            S_perturbations = np.zeros(len(state.qc))
-
-
-        def condensation(qc, particle_count, r_min, S_perturbation, E):
-            return bf.condensation(state.T, state.p, state.qv, qc_sum, qc, particle_count, r_min, self.dt, E, S_perturbation, math=math)
-        m = nucleation_slice(state, S_perturbations, self.microphysics)
+        def condensation(qc, particle_count, r_min, Sprime, E):
+            return bf.condensation(state.T, state.p, state.qv, qc_sum, qc, particle_count, r_min, self.dt, E, Sprime, math=math)
+        m = nucleation_slice(state, self.microphysics)
         delta_Ts, delta_qvs, delta_qc = np.zeros((3, len(state.qc)))
         delta_Ts[m], delta_qvs[m], delta_qc[m] = condensation(state.qc[m],
                                                               self.microphysics['particle_count'][m],
                                                               self.microphysics['r_min'][m],
-                                                              S_perturbations[m],
+                                                              state.Sprime[m],
                                                               state.E)
 
         delta_Ts_E = -(state.E * self.dt / bc.C_P / bc.RHO_AIR / self.l)
@@ -79,7 +70,6 @@ class Model(object):
     def prepare_new_state(self, old_state, math=np):
         new_state = old_state.copy()
         new_state.t += self.dt
-        qc_sum = math.sum(old_state.qc)
         cooling_rate = bf.dynamic_cooling(self.w)
         dz = self.w * self.dt
         new_state.z += dz
@@ -88,12 +78,19 @@ class Model(object):
                                                           np.mean(old_state.z),
                                                           dz)
         new_state.E = self.schemata['radiation'](new_state, self.microphysics)
+
+        qc_sum = math.sum(old_state.qc)
+        if qc_sum > 0.0:
+            new_state.Sprime = self.schemata['turbulence'](bf.radius(new_state.qc,
+                                                                self.microphysics['particle_count'],
+                                                                self.microphysics['r_min']),
+                                                      self.microphysics['particle_count'])
         return new_state
 
-def nucleation_slice(state, S_perturbations, microphysics):
+def nucleation_slice(state, microphysics):
     r_min = microphysics['r_min']
     particle_count = microphysics['particle_count']
-    S = bf.relative_humidity(state.T, state.p, state.qv) - 1 + S_perturbations
+    S = bf.relative_humidity(state.T, state.p, state.qv) - 1 + state.Sprime
     m = (S < bf.critical_super_saturation(r_min, state.T)) & (np.isclose(bf.radius(state.qc, particle_count, r_min), r_min))
     return np.invert(m)
 
