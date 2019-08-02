@@ -1,6 +1,12 @@
 import boxmodel_constants as c
 import numpy as np
 
+def potential_temperature(Tin, p, inverse=False):
+    e = c.R_G/c.C_P
+    if inverse:
+        e = -e
+    return Tin * (p[0]/p) ** e
+
 def stokes_falling_speed(r):
     '''return falling speed for water sphere in air'''
     return 2. / 9. * r * r * c.G * (c.RHO_H2O - c.RHO_AIR) / c.ETA_AIR
