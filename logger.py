@@ -175,6 +175,7 @@ class NetCDFLogger(BaseLogger):
             age_nc.units = self.units['age']
             Sprime_nc.units = ''
 
+            file_handle.ratio = self.initial_conditions['particle_distribution']['ratio']
             file_handle.ccn = self.initial_conditions['particle_distribution']['total']
             file_handle.w = self.initial_conditions['w']
             file_handle.r = self.initial_conditions['radiation_schema']['factor']
