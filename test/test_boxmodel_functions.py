@@ -1,6 +1,6 @@
 from unittest import TestCase, skip
 import warnings
-from boxmodel_functions import condensation_solver
+from boxmodel_functions import condensation_solver_euler as condensation_solver
 from boxmodel_functions import condensation
 from boxmodel_functions import radius
 
@@ -76,62 +76,6 @@ class TestCondensationSolver(_TestWarnings):
                             es=1599.80785594,
                             T=287.198552482,
                             S=S)
-
-class TestCondenstion(_TestWarnings):
-    def test_no_warning_with_qc_zero(self):
-        condensation(T=280,
-                     p=100000,
-                     qv=0.01,
-                     qc_sum=0.001,
-                     qc=0.,
-                     particle_count=1e6,
-                     r_min=1.e-6,
-                     dt=2,
-                     radiation=True)
-        condensation(T=280,
-                     p=100000,
-                     qv=0.01,
-                     qc_sum=0.001,
-                     qc=0.,
-                     particle_count=1e6,
-                     r_min=1.e-7,
-                     dt=2,
-                     radiation=True)
-
-    def test_no_warning_with_qc_zero_and_qc_sum_zero(self):
-        condensation(T=287.198552482,
-                     p=100000.0,
-                     qv=0.01,
-                     qc_sum=0,
-                     qc=0,
-                     particle_count=1e6,
-                     r_min=1.02113775484e-06,
-                     dt=2,
-                     radiation=True)
-
-    def test_no_warning_with_qc_zero_and_qc_sum_zero_without_radiation(self):
-        condensation(T=287.198552482,
-                     p=100000.0,
-                     qv=0.01,
-                     qc_sum=0,
-                     qc=0,
-                     particle_count=1e6,
-                     r_min=1.02113775484e-06,
-                     dt=2,
-                     radiation=False)
-
-    @skip
-    def test_no_warning_with_particle_count_zero(self):
-        with self.assertRaisesRegexp(AssertionError, 'particle count must be larger then 0'):
-            condensation(T=280,
-                         p=100000,
-                         qv=0.01,
-                         qc_sum=0.001,
-                         qc=0.0005,
-                         particle_count=0,
-                         r_min=1.e-7,
-                         dt=2,
-                         radiation=True)
 
 class TestRadiusCalculator(TestCase):
     def test_qc_greater_then_zero(self):
