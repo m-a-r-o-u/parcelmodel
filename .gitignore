@@ -8,3 +8,4 @@ plot*.py
 bin/
 misc/
 script/
+.vscode
