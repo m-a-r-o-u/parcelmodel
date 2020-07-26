@@ -30,7 +30,7 @@ class BaseLogger(object):
 
 class Logger(BaseLogger):
     def log_state(self, state):
-        print state
+        print(state)
 
 class FinalStateLogger(BaseLogger):
     def __init__(self):
@@ -40,7 +40,7 @@ class FinalStateLogger(BaseLogger):
         self.last_state = state
 
     def finalize(self):
-        print self.last_state
+        print(self.last_state)
 
 class PlotTLogger(BaseLogger):
     def __init__(self):
@@ -62,7 +62,7 @@ class PlotQVLogger(BaseLogger):
         self.qv = []
     
     def log_state(self, state):
-        print state.T
+        print(state.T)
         self.t.append(state.t)
         self.qv.append(state.qv)
 

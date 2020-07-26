@@ -40,7 +40,7 @@ class Model(object):
         logger.set_units(self.units)
         logger.log_state(state)
         while not self.is_converged(state):
-            print state.t
+            print(state.t)
             state = self.step(state)
             logger.log_state(state)
 

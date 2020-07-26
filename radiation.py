@@ -50,7 +50,7 @@ def libradtran_wrapper(t):
             def _g(state, microphysics):
                 return t(dz, state, microphysics)
             return _g
-        else: print 'libradtran_wrapper mode Error'
+        else: print('libradtran_wrapper mode Error')
     return _f
 
 RADIATION_SCHEMES = {

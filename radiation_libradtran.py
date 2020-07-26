@@ -68,12 +68,12 @@ def libRadTran_radiation_wrapper_thermal(height_in, lwc_in, reff_in):
         try:
             res = UVSPEC(_in=uvspec_input).stdout
         except sh.ErrorReturnCode as e:
-            print "UVSPEC INPUT WAS:"
-            print uvspec_input
-            print "UVSPEC STDERR WAS:"
-            print e.stderr
-            print "UVSPEC STDOUT WAS:"
-            print e.stdout
+            print("UVSPEC INPUT WAS:")
+            print(uvspec_input)
+            print("UVSPEC STDERR WAS:")
+            print(e.stderr)
+            print("UVSPEC STDOUT WAS:")
+            print(e.stdout)
             raise
         return np.array(map(float, res.split())).reshape(len(height_in),2).T
 
