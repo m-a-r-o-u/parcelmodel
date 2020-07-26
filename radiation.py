@@ -61,6 +61,6 @@ RADIATION_SCHEMES = {
 
 def choose_radiation_schema(definitions):
     definitions_r = dict(definitions['radiation_schema'])
-    definitions_r.update({k:v for k, v in definitions.iteritems() if k in ['l'] })
-    kwargs = {k:v for k,v in definitions_r.iteritems() if k != 'type'}
+    definitions_r.update({k:v for k, v in definitions.items() if k in ['l'] })
+    kwargs = {k:v for k,v in definitions_r.items() if k != 'type'}
     return RADIATION_SCHEMES[definitions_r['type']](**kwargs)

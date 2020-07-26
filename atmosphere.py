@@ -28,5 +28,5 @@ ATMOSPHERE_SCHEMES = {
 
 def choose_atmosphere_schema(definitions):
     definitions_t = definitions['atmosphere_schema']
-    kwargs = {k:v for k,v in definitions_t.iteritems() if k != 'type'}
+    kwargs = {k:v for k,v in definitions_t.items() if k != 'type'}
     return ATMOSPHERE_SCHEMES[definitions_t['type']](**kwargs)

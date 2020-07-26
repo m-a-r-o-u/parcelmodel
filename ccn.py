@@ -43,6 +43,6 @@ PARTICLE_DISTRIBUTIONS = {
 
 def choose_particle_distribution(definitions):
     definitions_p = dict(definitions['particle_distribution'])
-    definitions_p.update({k:v for k, v in definitions.iteritems() if k == 'groups' })
-    kwargs = {k:v for k,v in definitions_p.iteritems() if k != 'type'}
+    definitions_p.update({k:v for k, v in definitions.items() if k == 'groups' })
+    kwargs = {k:v for k,v in definitions_p.items() if k != 'type'}
     return PARTICLE_DISTRIBUTIONS[definitions_p['type']](**kwargs)

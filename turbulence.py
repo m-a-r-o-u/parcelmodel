@@ -30,6 +30,6 @@ TURBULENCE_SCHEMES = {
 
 def choose_turbulence_schema(definitions):
     definitions_t = dict(definitions['turbulence_schema'])
-    definitions_t.update({k:v for k, v in definitions.iteritems() if k in ['groups', 'dt', 'l'] })
-    kwargs = {k:v for k,v in definitions_t.iteritems() if k != 'type'}
+    definitions_t.update({k:v for k, v in definitions.items() if k in ['groups', 'dt', 'l'] })
+    kwargs = {k:v for k,v in definitions_t.items() if k != 'type'}
     return TURBULENCE_SCHEMES[definitions_t['type']](**kwargs)

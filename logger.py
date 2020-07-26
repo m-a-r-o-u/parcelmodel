@@ -10,7 +10,7 @@ def logger_factory(config):
 
 def kwargs(constructor, config):
     import inspect
-    return {k:v for k,v in config.iteritems() if k in inspect.getargspec(constructor.__init__).args}
+    return {k:v for k,v in config.items() if k in inspect.getargspec(constructor.__init__).args}
 
 class BaseLogger(object):
     def set_units(self, units):
@@ -192,7 +192,7 @@ class NetCDFLogger(BaseLogger):
 
 def create_group_for(string, logger, file_handle):
     params = file_handle.createGroup(string)
-    for k, v in logger.initial_conditions[string].iteritems():
+    for k, v in logger.initial_conditions[string].items():
         setattr(params, k, v)
 
 LOGGERS = {

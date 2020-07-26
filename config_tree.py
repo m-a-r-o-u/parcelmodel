@@ -6,7 +6,7 @@ def modify_config_tree(inp, match, f, path=None):
     if isinstance(inp, list):
         return [modify_config_tree(element, match, f, path+[i]) for i, element in enumerate(inp)]
     if isinstance(inp, dict):
-        return {k:modify_config_tree(v, match, f, path+[k]) for k,v in inp.iteritems()}
+        return {k:modify_config_tree(v, match, f, path+[k]) for k,v in inp.items()}
     return inp
 
 def replace_string_in_tree(inp, a, b):
@@ -26,7 +26,7 @@ def set_dict_item_in_tree(inp, key, value, path_prefix=None):
 def modify_item_in_config_tree(inp, key, value):
     if isinstance(inp, list):
         return [modify_item_in_config_tree(i, key, value) for i in inp]
-    return {k:modify_one_item(k, v, key, value) for k,v in inp.iteritems()}
+    return {k:modify_one_item(k, v, key, value) for k,v in inp.items()}
 
 def modify_one_item(k, v, k_ref, v_ref):
     if k == k_ref:
