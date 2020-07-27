@@ -1,6 +1,6 @@
 import numpy as np
-import boxmodel_functions as bf
-import boxmodel_constants as bc
+from . import boxmodel_functions as bf
+from . import boxmodel_constants as bc
 
 
 class Model(object):

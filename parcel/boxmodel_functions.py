@@ -1,4 +1,4 @@
-import boxmodel_constants as c
+from . import boxmodel_constants as c
 import numpy as np
 
 

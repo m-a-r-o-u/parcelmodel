@@ -1,5 +1,5 @@
 import numpy as np
-from markov_schema import Markov_schema
+from .markov_schema import Markov_schema
 
 
 def conservative_gauss_turbulence(Nsd, std):

@@ -1,9 +1,9 @@
 import yaml
-from setup import model_init
-from logger import logger_factory
-from config_tree import logger_config
-from my_argparse import argparse_init
-import executer
+from .setup import model_init
+from .logger import logger_factory
+from .config_tree import logger_config
+from .my_argparse import argparse_init
+from . import executer
 
 
 def main():

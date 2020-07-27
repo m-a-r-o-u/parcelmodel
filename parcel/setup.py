@@ -1,10 +1,10 @@
 import numpy as np
-from state import State
-from model import Model
-from ccn import choose_particle_distribution
-from radiation import choose_radiation_schema
-from turbulence import choose_turbulence_schema
-from atmosphere import choose_atmosphere_schema
+from .state import State
+from .model import Model
+from .ccn import choose_particle_distribution
+from .radiation import choose_radiation_schema
+from .turbulence import choose_turbulence_schema
+from .atmosphere import choose_atmosphere_schema
 
 
 def model_init(initial_conditions, executer):

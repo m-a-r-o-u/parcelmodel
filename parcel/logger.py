@@ -1,4 +1,4 @@
-from system_utils import check_make_directory
+from .system_utils import check_make_directory
 import numpy as np
 
 

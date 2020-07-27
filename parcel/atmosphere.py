@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.interpolate import interp1d
-import boxmodel_constants as c
+from . import boxmodel_constants as c
 
 
 def interp_afglus_wrapper(atmosphere_file):

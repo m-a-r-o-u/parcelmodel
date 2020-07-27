@@ -1,6 +1,6 @@
 import numpy as np
-from boxmodel_functions import stefan_boltzmann_law
-from radiation_libradtran import thermal_radiation_using_uvspec
+from .boxmodel_functions import stefan_boltzmann_law
+from .radiation_libradtran import thermal_radiation_using_uvspec
 
 
 def stefan_boltzmann_schema(state, microphysics, factor, dz):

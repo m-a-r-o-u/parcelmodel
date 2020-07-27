@@ -1,8 +1,8 @@
 import numpy as np
-import boxmodel_constants as c
+from . import boxmodel_constants as c
 import sh
 from tempfile import NamedTemporaryFile
-from boxmodel_functions import radius
+from .boxmodel_functions import radius
 
 
 def cloud_quantities(z, dz, qc, N, r_min):
