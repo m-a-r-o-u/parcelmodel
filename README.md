@@ -1,6 +1,6 @@
 # A atmospheric parcel model
 
-This model was developed to investigate the impact of thermal radiation and turbulence fluctuations
+This model was developed to investigate the impact of thermal radiation and saturation fluctuations due to turbulence
 on the development of the cloud droplet distribution. The motivation behind it, is to improve our understanding
 of rain development in ice free clouds. The description and results are summarized in the research paper:
 
