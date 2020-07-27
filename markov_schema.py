@@ -49,5 +49,6 @@ class Markov_schema(object):
         A1 = 3.e-4
         A2 = 2.8e-4
         tau_relax = (A2 * np.sum(r * N)) ** -1
-        if tau_relax < self.dt: raise Error
+        if tau_relax < self.dt:
+            raise Exception('tau_relax {} is smaller then the timestep {}'.format(tau_relax, self.dt))
         return self.dt * (A1 * self.w - self.S / tau_relax)
