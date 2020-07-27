@@ -1,16 +1,18 @@
 import numpy as np
 from state import State
 
+
 class NormalExecuter(object):
     def __init__(self, function, model, state, n_steps):
         self.func = function
         self.model = model
         self.n_steps = n_steps
-    
+
     def step(self, state):
         for _ in range(self.n_steps):
             state = self.func(self.model, state, math=np)
         return state
+
 
 class TheanoExecuter():
     def __init__(self, function, model, state, n_steps):
@@ -33,10 +35,11 @@ class TheanoExecuter():
 
         final_result = [res[-1] for res in result]
 
-        self.func = theano.function(inputs=variables, outputs=final_result, updates=updates)
-    
+        self.func = theano.function(
+            inputs=variables, outputs=final_result, updates=updates)
+
     def step(self, state):
-        t, T, p, qv, qc = self.func(state.t, 
+        t, T, p, qv, qc = self.func(state.t,
                                     state.T,
                                     state.p,
                                     state.qv,

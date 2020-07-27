@@ -6,9 +6,9 @@ from boxmodel_functions import radius
 
 
 def cloud_quantities(z, dz, qc, N, r_min):
-    zmin = np.min(z) - np.min(z)%dz
-    zmax = np.max(z) + (dz - np.max(z)%dz)
-    zgrid = np.arange(zmin, zmax+dz, dz)
+    zmin = np.min(z) - np.min(z) % dz
+    zmax = np.max(z) + (dz - np.max(z) % dz)
+    zgrid = np.arange(zmin, zmax + dz, dz)
     weights = qc
     weights2 = radius(qc, N, r_min) ** 2
     weights3 = radius(qc, N, r_min) ** 3
@@ -21,17 +21,19 @@ def cloud_quantities(z, dz, qc, N, r_min):
     r3 = np.append(r3, 0.0)
     return zgrid, qc, r3
 
+
 def libRadTran_radiation_wrapper_thermal(height_in, lwc_in, reff_in):
     height = height_in[::-1] / float(1000)
     lwc = lwc_in[::-1] * float(1000)
     reff = reff_in[::-1] * 1.e6
 
-    cloud_input = '\n'.join(['{}\t{}\t{}'.format(h, l, r) for h, l, r in zip(height, lwc, reff)])
+    cloud_input = '\n'.join(['{}\t{}\t{}'.format(h, l, r)
+                             for h, l, r in zip(height, lwc, reff)])
     with NamedTemporaryFile(delete=False) as cloud_file:
         cloud_file.write(cloud_input)
         cloud_file.flush()
         cloud_file_name = cloud_file.name
-        #what is layer_fd doing?
+        # what is layer_fd doing?
         uvspec_input_param = {
             'data_files_path': '/home/m/Mares.Barekzai/Software/libRadtran/data ',
             'atmosphere_file': '/home/m/Mares.Barekzai/Software/libRadtran/data/atmmod/afglus.dat',
@@ -45,9 +47,9 @@ def libRadTran_radiation_wrapper_thermal(height_in, lwc_in, reff_in):
             'wc_file_dimension': '1D',
             'wc_file': cloud_file_name,
             'output_process': 'sum',
-            'zout': ' '.join((height_in/float(1000)).astype(str)),
+            'zout': ' '.join((height_in / float(1000)).astype(str)),
             'layer___': 'layer_fd',
-            }
+        }
         uvspec_input = """
         data_files_path {data_files_path}
         atmosphere_file {atmosphere_file}
@@ -75,22 +77,25 @@ def libRadTran_radiation_wrapper_thermal(height_in, lwc_in, reff_in):
             print("UVSPEC STDOUT WAS:")
             print(e.stdout)
             raise
-        return np.array(map(float, res.split())).reshape(len(height_in),2).T
+        return np.array(map(float, res.split())).reshape(len(height_in), 2).T
+
 
 def link_hight_to_radiation(z, zgrid, r, hr, rho_sp, rho=1):
     m = []
     for i in range(0, len(zgrid) - 1, 1):
         mlow = z < zgrid[i]
-        mhig = z < zgrid[i+1]
+        mhig = z < zgrid[i + 1]
         m.append(~mlow & mhig)
     res = np.zeros(len(z))
     for i in range(len(m)):
         res[m[i]] = heating_rate_to_Enet(hr[i], r[m[i]], rho_sp, rho=rho)
     return res
 
+
 def heating_rate_to_Enet(hr, r, rho_sp, rho=1):
     r2_total = np.sum(r**2)
     return - hr * c.C_P * rho / 24. / 60. / 60. / r2_total / np.pi / rho_sp
+
 
 def thermal_radiation_using_uvspec(dz, state, microphysics):
     r_min = microphysics['r_min']

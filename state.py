@@ -9,7 +9,7 @@ class State(object):
         self.E = E
         self.age = age
         self.Sprime = Sprime
-    
+
     def __repr__(self):
         return 'State({}, {}, {}, {}, {}, {}, {}, {}, {})'.format(self.t, self.T, self.p, self.qv, self.qc, self.z, self.E, self.age, self.Sprime)
 

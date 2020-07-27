@@ -1,6 +1,7 @@
 from system_utils import check_make_directory
 import numpy as np
 
+
 def logger_factory(config):
     if isinstance(config, list):
         return MultiLogger([logger_factory(c) for c in config])
@@ -8,9 +9,11 @@ def logger_factory(config):
         constructor = LOGGERS[config['type']]
         return constructor(**kwargs(constructor, config))
 
+
 def kwargs(constructor, config):
     import inspect
-    return {k:v for k,v in config.items() if k in inspect.getargspec(constructor.__init__).args}
+    return {k: v for k, v in config.items() if k in inspect.getargspec(constructor.__init__).args}
+
 
 class BaseLogger(object):
     def set_units(self, units):
@@ -28,9 +31,11 @@ class BaseLogger(object):
     def __exit__(self, *args):
         self.finalize()
 
+
 class Logger(BaseLogger):
     def log_state(self, state):
         print(state)
+
 
 class FinalStateLogger(BaseLogger):
     def __init__(self):
@@ -42,11 +47,12 @@ class FinalStateLogger(BaseLogger):
     def finalize(self):
         print(self.last_state)
 
+
 class PlotTLogger(BaseLogger):
     def __init__(self):
         self.t = []
         self.T = []
-    
+
     def log_state(self, state):
         self.t.append(state.t)
         self.T.append(state.T)
@@ -56,11 +62,12 @@ class PlotTLogger(BaseLogger):
         plt.plot(self.t, self.T)
         plt.savefig('T.png')
 
+
 class PlotQVLogger(BaseLogger):
     def __init__(self):
         self.t = []
         self.qv = []
-    
+
     def log_state(self, state):
         print(state.T)
         self.t.append(state.t)
@@ -70,6 +77,7 @@ class PlotQVLogger(BaseLogger):
         import matplotlib.pyplot as plt
         plt.plot(self.t, self.qv)
         plt.savefig('qv.png')
+
 
 class MultiLogger(BaseLogger):
     def __init__(self, loggers):
@@ -90,6 +98,7 @@ class MultiLogger(BaseLogger):
     def finalize(self):
         for logger in self.loggers:
             logger.finalize()
+
 
 class PlotTimeSeriesLogger(BaseLogger):
     def __init__(self, quantities, file_name='time_series', file_path='./'):
@@ -119,6 +128,7 @@ class PlotTimeSeriesLogger(BaseLogger):
         axes[-1].set_xlabel('time')
         fig.savefig(join(self.file_path, self.file_name), bbox_inches='tight')
 
+
 class NetCDFLogger(BaseLogger):
     def __init__(self, file_name='time_series', file_path='./'):
         self.file_path = file_path
@@ -144,16 +154,21 @@ class NetCDFLogger(BaseLogger):
             t_dim_nc = 'time'
             particle_dim_nc = 'super_particles'
             file_handle.createDimension(t_dim_nc, len(self.states))
-            file_handle.createDimension(particle_dim_nc, len(self.states[0].qc))
+            file_handle.createDimension(
+                particle_dim_nc, len(self.states[0].qc))
             time_nc = file_handle.createVariable('time', 'i4', (t_dim_nc))
             T_nc = file_handle.createVariable('T', 'f4', (t_dim_nc))
             p_nc = file_handle.createVariable('p', 'f4', (t_dim_nc))
             qv_nc = file_handle.createVariable('qv', 'f4', (t_dim_nc))
-            qc_nc = file_handle.createVariable('qc', 'f4', (t_dim_nc, particle_dim_nc))
-            z_nc = file_handle.createVariable('z', 'f4', (t_dim_nc, particle_dim_nc))
+            qc_nc = file_handle.createVariable(
+                'qc', 'f4', (t_dim_nc, particle_dim_nc))
+            z_nc = file_handle.createVariable(
+                'z', 'f4', (t_dim_nc, particle_dim_nc))
             E_nc = file_handle.createVariable('E', 'f4', (t_dim_nc))
-            age_nc = file_handle.createVariable('age', 'f4', (t_dim_nc, particle_dim_nc))
-            Sprime_nc = file_handle.createVariable('Sprime', 'f4', (t_dim_nc, particle_dim_nc))
+            age_nc = file_handle.createVariable(
+                'age', 'f4', (t_dim_nc, particle_dim_nc))
+            Sprime_nc = file_handle.createVariable(
+                'Sprime', 'f4', (t_dim_nc, particle_dim_nc))
 
             time_nc[:] = [state.t for state in self.states]
             T_nc[:] = [state.T for state in self.states]
@@ -186,17 +201,19 @@ class NetCDFLogger(BaseLogger):
 
             create_group_for('radiation_schema', self, file_handle)
             create_group_for('particle_distribution', self, file_handle)
-            #create_group_for('turbulence_schema', self, file_handle)
+            create_group_for('turbulence_schema', self, file_handle)
             create_group_for('atmosphere_schema', self, file_handle)
             create_group_for('feedback', self, file_handle)
+
 
 def create_group_for(string, logger, file_handle):
     params = file_handle.createGroup(string)
     for k, v in logger.initial_conditions[string].items():
         setattr(params, k, v)
 
+
 LOGGERS = {
     'MultiPlotLogger': PlotTimeSeriesLogger,
     'Logger': Logger,
     'NetCDFLogger': NetCDFLogger,
-     }
+}

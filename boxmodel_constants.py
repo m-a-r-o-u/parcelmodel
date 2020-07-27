@@ -1,12 +1,15 @@
 '''hold frequently used constants of cloud microphysics'''
 
+
 class Constant(float):
-  '''Class for pysical constants'''
-  def __new__(cls, value, units, doc):
-    self = float.__new__(cls, value)
-    self.units = units
-    self.doc = doc
-    return self
+    '''Class for pysical constants'''
+
+    def __new__(cls, value, units, doc):
+        self = float.__new__(cls, value)
+        self.units = units
+        self.doc = doc
+        return self
+
 
 D            = Constant( 2.82e-5,     'm2 s-1',         'diffusion constant of water vapor in air')
 K            = Constant( 2.43e-2,  'W m-1 K-1',                      'thermal conductivity of air')
