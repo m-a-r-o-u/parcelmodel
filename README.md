@@ -3,6 +3,7 @@
 This model was developed to investigate the impact of thermal radiation and turbulence fluctuations
 on the development of the cloud droplet distribution. The motivation behind it, is to improve our understanding
 of rain development in ice free clouds. The description and results are summarized in the research paper:
+
 [Broadening of the Cloud Droplet Size Distribution due to Thermal Radiative Cooling: Turbulent Parcel Simulations](https://journals.ametsoc.org/jas/article/77/6/1993/345221)
 
 ## Basic Usage
