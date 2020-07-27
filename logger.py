@@ -186,7 +186,7 @@ class NetCDFLogger(BaseLogger):
 
             create_group_for('radiation_schema', self, file_handle)
             create_group_for('particle_distribution', self, file_handle)
-            create_group_for('turbulence_schema', self, file_handle)
+            #create_group_for('turbulence_schema', self, file_handle)
             create_group_for('atmosphere_schema', self, file_handle)
             create_group_for('feedback', self, file_handle)
 
